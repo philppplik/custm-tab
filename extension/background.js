@@ -85,3 +85,61 @@ chrome.notifications.onClicked.addListener(async (notificationId) => {
 chrome.action.onClicked.addListener(() => {
   chrome.runtime.openOptionsPage();
 });
+
+// ── Omnibox search (keyword: "ct") ────────────────
+// Load the shared engine registry into the SW context so we can build
+// search URLs without a separate copy.
+try {
+  importScripts('search-engines.js');
+} catch (e) {
+  console.warn('cust*m Tab: failed to import search-engines.js', e);
+}
+
+const OMNIBOX = {
+  lastInput: '',
+};
+
+chrome.omnibox.onInputChanged.addListener((text, suggest) => {
+  OMNIBOX.lastInput = text || '';
+  try {
+    const engines = self.CUSTM_ENGINES.top();
+    const q = OMNIBOX.lastInput.trim();
+    suggest(
+      engines.map((e) => ({
+        content: e.id + ' ' + q,
+        description: `${e.icon} Suche auf ${e.name}: ${q || '…'}`,
+      }))
+    );
+  } catch {}
+});
+
+chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
+  let engineId = null;
+  let query = text;
+  const parts = (text || '').trim().split(/\s+/);
+  // If the first token matches an engine id, use it; else fall back to stored default.
+  try {
+    if (self.CUSTM_ENGINES.getById(parts[0]).id === parts[0]) {
+      engineId = parts[0];
+      query = parts.slice(1).join(' ');
+    }
+  } catch {}
+  if (!engineId) {
+    const s = await chrome.storage.local.get(['searchEngine']);
+    engineId = s.searchEngine || 'duckduckgo';
+    query = text;
+  }
+  const url = self.CUSTM_ENGINES.buildUrl(engineId, query);
+
+  if (disposition === 'newForegroundTab') {
+    chrome.tabs.create({ url });
+  } else if (disposition === 'newBackgroundTab') {
+    chrome.tabs.create({ url, active: false });
+  } else {
+    chrome.tabs.update({ url });
+  }
+});
+
+chrome.omnibox.setDefaultSuggestion({
+  description: 'cust*m Tab — Suche mit deiner Standard-Suchmaschine',
+});

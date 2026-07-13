@@ -13,8 +13,11 @@
  *   privacy : 'high' | 'medium' | 'low' — drives the privacy badge.
  *
  * No build step, no modules — attaches to `window.CUSTM_ENGINES`.
+ * Compatible with both page context (`window`) and service-worker
+ * context (`self`), so background.js can importScripts() it for the
+ * omnibox feature.
  */
-(function () {
+(function (global) {
   'use strict';
 
   const ENGINES = [
@@ -229,10 +232,10 @@
     return engine.url.replace('{query}', encodeURIComponent(query));
   }
 
-  window.CUSTM_ENGINES = {
+  global.CUSTM_ENGINES = {
     all: ENGINES,
     top: topEngines,
     getById,
     buildUrl,
   };
-})();
+})(typeof self !== 'undefined' ? self : window);

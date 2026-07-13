@@ -4,6 +4,7 @@
  * - Redirect mode: loads targetUrl in full-screen iframe (keeps extension
  *   URL in address bar when maskUrl on; otherwise navigates directly).
  * - Dashboard mode: clock, greeting, search (engine picker), bookmarks.
+ *   Bookmarks support live edit (modal), delete, and drag-and-drop reorder.
  * Settings come from chrome.storage.local via CUSTM_STORE.
  */
 (function () {
@@ -99,6 +100,7 @@
 
   /* ── Bookmarks ────────────────────────────────── */
   let bookmarks = [];
+  let dragIndex = null;
 
   function renderBookmarks() {
     const grid = $('shortcuts-grid');
@@ -107,15 +109,55 @@
     bookmarks.forEach((bm, index) => {
       const item = document.createElement('div');
       item.className = 'sc-item';
+      item.draggable = true;
+      item.dataset.index = index;
       item.innerHTML = `
         <div class="btn-del" data-del="${index}" title="Entfernen">✕</div>
+        <button class="btn-edit" data-edit="${index}" title="Bearbeiten" aria-label="Bearbeiten">✎</button>
         <a class="full-link" href="${bm.url}" target="_blank" rel="noopener"></a>
         <div class="sc-icon"><img src="${favicon(bm.url)}" onerror="this.style.display='none'"></div>
         <span class="sc-label">${bm.name}</span>`;
-      item.addEventListener('contextmenu', (ev) => {
-        ev.preventDefault();
+
+      // Drag & drop reorder
+      item.addEventListener('dragstart', (e) => {
+        dragIndex = index;
+        item.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        try {
+          e.dataTransfer.setData('text/plain', String(index));
+        } catch {}
+      });
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+        document
+          .querySelectorAll('.sc-item')
+          .forEach((el) => el.classList.remove('drag-over'));
+      });
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        item.classList.add('drag-over');
+      });
+      item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+      item.addEventListener('drop', (e) => {
+        e.preventDefault();
+        item.classList.remove('drag-over');
+        const to = index;
+        if (dragIndex === null || dragIndex === to) return;
+        const moved = bookmarks.splice(dragIndex, 1)[0];
+        bookmarks.splice(to, 0, moved);
+        dragIndex = null;
+        window.CUSTM_STORE.set({ bookmarks });
+        renderBookmarks();
+      });
+
+      // Edit button (stop the full-link from navigating)
+      item.querySelector('.btn-edit').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         openModal(index);
       });
+
       grid.appendChild(item);
     });
 
@@ -178,6 +220,9 @@
         renderBookmarks();
       }
     });
+
+    // Allow dropping anywhere on the grid empties reorder gracefully
+    grid.addEventListener('dragover', (e) => e.preventDefault());
 
     $('engine-current').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -252,6 +297,10 @@
   (async () => {
     try {
       chrome.storage.local.set({ lastSeen: Date.now() });
+    } catch {}
+
+    try {
+      await window.CUSTM_STORE.pullSyncIfEnabled();
     } catch {}
 
     const s = await window.CUSTM_STORE.getAll();

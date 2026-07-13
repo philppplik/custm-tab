@@ -21,6 +21,7 @@
   const themeToggle = $('theme-toggle');
   const onboardingBanner = $('onboarding-banner');
   const btnDismissOnboard = $('btn-dismiss-onboarding');
+  const syncToggle = $('toggle-sync');
 
   let currentTheme = 'auto';
   let currentMode = 'dashboard';
@@ -161,6 +162,7 @@
     settings.mode === 'redirect' ? !!settings.targetUrl : true;
   updateStatusBadge(isActive);
   if (settings.targetUrl) await validateUrl(settings.targetUrl);
+  syncToggle.checked = settings.syncEnabled === true;
 
   // Onboarding banner
   const params = new URLSearchParams(location.search);
@@ -174,27 +176,37 @@
 
   /* ── Save ─────────────────────────────────────── */
   btnSave.addEventListener('click', async () => {
+    const patch = {
+      searchEngine: engineSelect.value,
+      theme: currentTheme,
+      syncEnabled: syncToggle.checked,
+    };
     if (currentMode === 'redirect') {
       const state = await validateUrl(urlInput.value);
       if (state === 'invalid') return;
-      await window.CUSTM_STORE.set({
+      Object.assign(patch, {
         mode: 'redirect',
         targetUrl: urlInput.value.trim(),
         maskUrl: maskUrlToggle.checked,
-        theme: currentTheme,
-        searchEngine: engineSelect.value,
       });
       updateStatusBadge(!!urlInput.value.trim());
     } else {
-      await window.CUSTM_STORE.set({
-        mode: 'dashboard',
-        theme: currentTheme,
-        searchEngine: engineSelect.value,
-      });
+      Object.assign(patch, { mode: 'dashboard' });
       updateStatusBadge(true);
+    }
+    await window.CUSTM_STORE.set(patch);
+    if (syncToggle.checked) {
+      // best-effort: pull any settings already on other devices
+      try {
+        await window.CUSTM_STORE.pullSyncIfEnabled();
+      } catch {}
     }
     showSaveFeedback();
   });
+
+  syncToggle.addEventListener('change', () =>
+    chrome.storage.local.set({ syncEnabled: syncToggle.checked })
+  );
 
   maskUrlToggle.addEventListener('change', () =>
     chrome.storage.local.set({ maskUrl: maskUrlToggle.checked })

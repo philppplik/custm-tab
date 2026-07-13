@@ -21,6 +21,12 @@ wizard.
 
 <img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **26 search engines.** 5 curated engines in the dashboard picker + 20 more in settings, each with a privacy badge.
 
+<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Live bookmark editor.** Add, edit, delete, and **drag-and-drop reorder** tiles right on the dashboard — changes persist instantly.
+
+<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Omnibox search.** Type `ct` in the address bar to search with your engine — `ct brave cats` forces Brave.
+
+<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Optional sync.** Opt in to mirror mode, engine, theme and URL across devices via `chrome.storage.sync` (bookmarks stay local).
+
 <img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Zero-friction setup.** A 4-step wizard runs on first install: mode → bookmarks → search → theme.
 
 <img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Persistence monitor.** An hourly check warns you if Chrome silently disables the new-tab override.

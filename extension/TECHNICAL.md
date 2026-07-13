@@ -139,3 +139,52 @@ No bundler. To load:
 
 To repackage for a store, zip the `extension/` directory contents (not the folder
 itself) and submit. No compilation step.
+
+## 11. Bookmark editor (dashboard, live)
+
+Bookmarks are editable directly on the dashboard — no page reload needed.
+
+- **Add**: the `+` tile opens the modal (`openModal(-1)`).
+- **Edit**: the pencil button (`.btn-edit`, top-left on hover) opens the modal
+  pre-filled (`openModal(index)`).
+- **Delete**: the ✕ button (`.btn-del`, top-right on hover) removes the tile.
+- **Reorder**: HTML5 drag-and-drop. Each `.sc-item` is `draggable`; on `drop`
+  the array is spliced and re-inserted, then persisted and re-rendered.
+
+All mutations write through `CUSTM_STORE.set({ bookmarks })` so the change
+survives reloads. Bookmarks are **never** synced (see §12).
+
+## 12. Optional sync (`storage.sync`)
+
+When the user enables **Sync** (Settings → "Einstellungen synchronisieren"), a
+curated subset of settings mirrors to `chrome.storage.sync` so it follows the
+user's Google account across machines:
+
+| Synced | Not synced |
+|--------|-----------|
+| `mode`, `targetUrl`, `maskUrl` | `bookmarks` (device/personal) |
+| `searchEngine`, `theme` | `onboardingDone`, `lastSeen`, `browserLastStartup`, `lastNotified` |
+
+`store.set(patch)` mirrors only syncable keys when `syncEnabled` is true;
+`store.pullSyncIfEnabled()` pulls synced settings into local at boot. All sync
+calls are wrapped in try/catch — if `storage.sync` is unavailable or over quota,
+the operation fails soft and `chrome.storage.local` remains authoritative.
+
+## 13. Omnibox keyword search
+
+The manifest declares `"omnibox": { "keyword": "ct" }`. Typing `ct` in the
+address bar activates cust*m Tab search:
+
+- `ct cats` → searches with the stored default engine.
+- `ct brave cats` → forces the Brave engine (first token matched against engine ids).
+- `onInputChanged` suggests the top 5 engines; `onInputEntered` builds the URL
+  via `CUSTM_ENGINES.buildUrl` and opens it per the disposition
+  (current / new foreground / new background tab).
+
+`background.js` loads `search-engines.js` via `importScripts()` so the SW has
+the same engine registry as the pages (no duplication).
+
+## 14. Permissions rationale (addendum)
+
+`omnibox` is required for the keyword search feature. No new runtime host
+permissions are added — searches navigate to public engine URLs only.
