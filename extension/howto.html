@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cust*m Tab — How-to Guides</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="howto.css">
+</head>
+<body>
+  <div class="ct-ambient" aria-hidden="true">
+    <div class="e e-purple"></div>
+    <div class="e e-red"></div>
+    <div class="e e-yellow"></div>
+    <div class="ct-blur"></div>
+  </div>
+
+  <div class="ct-page">
+  <header class="doc-header">
+    <div class="doc-header__brand">
+      <img class="doc-header__logo" src="custmTab-logo.svg" alt="cust*m Tab logo" width="28" height="28">
+      <h1 class="doc-header__title">cust*m Tab <span class="doc-header__subtitle">How-to Guides</span></h1>
+    </div>
+    <button id="btn-back" class="btn-back">Back to Settings</button>
+  </header>
+
+  <main class="doc-main">
+    <nav class="doc-nav">
+      <a href="#getting-started">Getting Started</a>
+      <a href="#local-files">Local Files</a>
+      <a href="#hide-url">Hide URL Mode</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+    </nav>
+
+    <!-- Getting Started -->
+    <section id="getting-started" class="doc-section">
+      <h2>Getting Started</h2>
+      <ol class="step-list">
+        <li>
+          <div class="step-body">
+            <strong>Open Settings</strong>
+            <span>Click the <strong>cust*m Tab</strong> icon in your Chrome toolbar, or go to <code>chrome://extensions</code> → Details → Extension options.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <strong>Enter your custom URL</strong>
+            <span>Type any web address (e.g. <code>https://notion.so</code>, <code>https://chat.openai.com</code>) or a local file path (e.g. <code>file:///C:/Users/you/dashboard.html</code>).</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <strong>Click Save</strong>
+            <span>Open a new tab — your custom page loads instantly. That's it.</span>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Local Files -->
+    <section id="local-files" class="doc-section">
+      <h2>Using Local Files</h2>
+      <p>You can set any local file as your new tab page. Chrome requires a one-time permission for this.</p>
+      <h3>Step 1: Enable file access</h3>
+      <ol>
+        <li>Go to <a href="chrome://extensions" target="_blank" rel="noopener">chrome://extensions</a></li>
+        <li>Find <strong>cust*m Tab</strong> → click <em>Details</em></li>
+        <li>Enable <em>"Allow access to file URLs"</em></li>
+      </ol>
+      <h3>Step 2: Set the file path</h3>
+      <p>Enter the full file path in the URL field, e.g.:</p>
+      <p><code>file:///C:/Users/you/Documents/my-page.html</code></p>
+      <div class="note">
+        <span class="note-icon">⚠</span>
+        <p>Chrome restricts <code>file://</code> access for security. This is a one-time setup — you only need to do this once.</p>
+      </div>
+    </section>
+
+    <!-- Hide URL vs Redirect -->
+    <section id="hide-url" class="doc-section">
+      <h2>Hide URL vs Redirect Mode</h2>
+      <p>The <em>"Hide target URL in address bar"</em> toggle controls how your custom page is loaded.</p>
+      <table class="mode-table">
+        <thead>
+          <tr><th></th><th>Hide URL ON (iframe)</th><th>Hide URL OFF (redirect)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Address bar shows</td><td><code>chrome-extension://…</code></td><td>Target URL</td></tr>
+          <tr><td>Page embedded in</td><td>Inline iframe</td><td>Full page navigation</td></tr>
+          <tr><td>Privacy</td><td>URL stays hidden</td><td>Visible</td></tr>
+          <tr><td>Compatibility</td><td>Some sites block embedding</td><td>Works everywhere</td></tr>
+        </tbody>
+      </table>
+      <div class="note">
+        <span class="note-icon">💡</span>
+        <p>Leave <em>Hide URL</em> ON by default. If a page shows "Page blocks embedding", switch it OFF for that specific site.</p>
+      </div>
+    </section>
+
+    <!-- Troubleshooting -->
+    <section id="troubleshooting" class="doc-section">
+      <h2>Troubleshooting</h2>
+
+      <details class="faq-item">
+        <summary>
+          <span>"Page blocks embedding" error</span>
+          <span class="faq-chevron">›</span>
+        </summary>
+        <div class="faq-body">
+          <p>The target site sets <code>X-Frame-Options: deny</code> to prevent being embedded in iframes. This is a safety feature — you cannot override it.</p>
+          <p><strong>Fix:</strong> In Settings, turn OFF "Hide target URL in address bar" and Save. The page will open directly instead of in an iframe.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span>Local file doesn't load / blank page</span>
+          <span class="faq-chevron">›</span>
+        </summary>
+        <div class="faq-body">
+          <p>Chrome requires "Allow access to file URLs" permission for extensions to load local files.</p>
+          <p><strong>Fix:</strong> Go to <a href="chrome://extensions" target="_blank" rel="noopener">chrome://extensions</a> → Details → Enable "Allow access to file URLs".</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span>"Extension disabled" popup</span>
+          <span class="faq-chevron">›</span>
+        </summary>
+        <div class="faq-body">
+          <p>Chrome may disable extensions after updates or sync changes. This is a known Chrome behavior.</p>
+          <p><strong>Fix:</strong> Go to <a href="chrome://extensions" target="_blank" rel="noopener">chrome://extensions</a> and re-enable the extension. Your settings are preserved.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span>Page loads slowly</span>
+          <span class="faq-chevron">›</span>
+        </summary>
+        <div class="faq-body">
+          <p>JS-heavy pages take time to render. Enable "Preload page every 10 minutes" to keep the page warm in the background.</p>
+          <p><strong>Note:</strong> This opens the target page in a hidden tab to keep it loaded.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>
+          <span>Address bar shows a long URL after loading</span>
+          <span class="faq-chevron">›</span>
+        </summary>
+        <div class="faq-body">
+          <p>This happens when <em>"Hide target URL"</em> is OFF. To hide it, enable the toggle in Settings — your new tab will show <code>chrome-extension://…</code> instead.</p>
+        </div>
+      </details>
+    </section>
+  </main>
+  </div>
+
+  <script src="howto.js"></script>
+</body>
+</html>

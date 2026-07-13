@@ -1,0 +1,210 @@
+/* ============================================================
+   cust*m Tab — Shared Design System
+   Gradient / glass look from newtab.html, extracted to CSS
+   variables so every page (newtab, options, howto, wizard)
+   stays visually consistent. Load this FIRST, then page css.
+   ============================================================ */
+
+:root {
+  /* ── Brand palette ─────────────────────────────── */
+  --ct-bg-deep: #180646;
+  --ct-purple: #29058e;
+  --ct-red: #ff3300;
+  --ct-yellow: #edd30f;
+  --ct-accent: #ff3300;
+
+  /* ── Text ───────────────────────────────────────── */
+  --ct-text: #ffffff;
+  --ct-text-dim: rgba(255, 255, 255, 0.6);
+  --ct-text-faint: rgba(255, 255, 255, 0.35);
+
+  /* ── Glass surfaces ─────────────────────────────── */
+  --ct-glass: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  --ct-glass-hover: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  --ct-glass-card: rgba(27, 19, 43, 0.85);
+  --ct-glass-border: rgba(255, 255, 255, 0.2);
+  --ct-glass-border-soft: rgba(255, 255, 255, 0.12);
+
+  /* ── Shadows ────────────────────────────────────── */
+  --ct-shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.6);
+  --ct-shadow-md: 0 10px 20px rgba(0, 0, 0, 0.4);
+
+  /* ── Radius ─────────────────────────────────────── */
+  --ct-radius-lg: 40px;
+  --ct-radius-md: 20px;
+  --ct-radius-sm: 12px;
+
+  --ct-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+/* ── Light theme overrides ──────────────────────── */
+:root[data-theme="light"] {
+  --ct-bg-deep: #f4f1fb;
+  --ct-text: #1b132b;
+  --ct-text-dim: rgba(27, 19, 43, 0.6);
+  --ct-text-faint: rgba(27, 19, 43, 0.35);
+  --ct-glass: linear-gradient(
+    135deg,
+    rgba(27, 19, 43, 0.06) 0%,
+    rgba(27, 19, 43, 0.02) 100%
+  );
+  --ct-glass-hover: linear-gradient(
+    135deg,
+    rgba(27, 19, 43, 0.1) 0%,
+    rgba(27, 19, 43, 0.04) 100%
+  );
+  --ct-glass-card: rgba(255, 255, 255, 0.9);
+  --ct-glass-border: rgba(27, 19, 43, 0.15);
+  --ct-glass-border-soft: rgba(27, 19, 43, 0.1);
+  --ct-shadow-lg: 0 30px 60px rgba(41, 5, 142, 0.15);
+  --ct-shadow-md: 0 10px 20px rgba(41, 5, 142, 0.1);
+}
+
+/* ── Ambient gradient background (shared) ────────── */
+.ct-ambient {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--ct-bg-deep);
+}
+.ct-ambient .e {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  border-radius: 50%;
+}
+.ct-ambient .e-purple {
+  width: 100vw;
+  height: 100vw;
+  background-color: var(--ct-purple);
+  transform: translate(-50%, 50%);
+  z-index: 1;
+}
+.ct-ambient .e-red {
+  width: 87.64vw;
+  height: 78.33vw;
+  background-color: var(--ct-red);
+  transform: translate(-50%, calc(50% + 4.72vw));
+  z-index: 2;
+  opacity: 0.55;
+}
+.ct-ambient .e-yellow {
+  width: 72.91vw;
+  height: 56.73vw;
+  background-color: var(--ct-yellow);
+  transform: translate(-50%, calc(50% + 8.09vw));
+  z-index: 3;
+  opacity: 0.4;
+}
+/* Soft blur so colors bloom instead of hard edges */
+.ct-ambient .ct-blur {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(55px);
+  -webkit-backdrop-filter: blur(55px);
+  z-index: 10;
+}
+
+/* ── Page frame for sub-pages (options / howto / wizard) ──
+   A subtle gradient border hinting at the new-tab gradient. */
+.ct-page {
+  position: relative;
+  z-index: 20;
+  min-height: 100vh;
+  padding: 40px 24px 60px;
+  color: var(--ct-text);
+  font-family: var(--ct-font);
+}
+.ct-page::before {
+  content: "";
+  position: fixed;
+  inset: 12px;
+  border-radius: var(--ct-radius-md);
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 51, 0, 0.5),
+    rgba(237, 211, 15, 0.3) 40%,
+    rgba(41, 5, 142, 0.4)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ── Shared components ───────────────────────────── */
+.ct-card {
+  background: var(--ct-glass-card);
+  border: 1px solid var(--ct-glass-border);
+  border-radius: var(--ct-radius-md);
+  box-shadow: var(--ct-shadow-lg);
+  padding: 28px;
+}
+.ct-btn-primary {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+  font-family: var(--ct-font);
+}
+.ct-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
+}
+.ct-btn-ghost {
+  background: transparent;
+  color: var(--ct-text-dim);
+  border: 1px solid var(--ct-glass-border-soft);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.2s;
+  font-family: var(--ct-font);
+}
+.ct-btn-ghost:hover {
+  color: var(--ct-text);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Reusable glass input used across pages */
+.ct-input {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--ct-glass-border-soft);
+  color: var(--ct-text);
+  border-radius: var(--ct-radius-sm);
+  font-size: 1rem;
+  outline: none;
+  font-family: var(--ct-font);
+}
+:root[data-theme="light"] .ct-input {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(27, 19, 43, 0.1);
+}
+.ct-input:focus {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+:root[data-theme="light"] .ct-input:focus {
+  border-color: var(--ct-purple);
+}

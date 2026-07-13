@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cust*m Tab</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+
+  <!-- Redirect mode: full-screen iframe (target URL embedded) -->
+  <div id="redirect-frame-wrap" class="redirect-frame-wrap" hidden>
+    <iframe id="redirect-frame" class="redirect-frame" title="Custom tab target"></iframe>
+  </div>
+
+  <!-- Ambient gradient background (shared) -->
+  <div class="ct-ambient" aria-hidden="true">
+    <div class="e e-purple"></div>
+    <div class="e e-red"></div>
+    <div class="e e-yellow"></div>
+    <div class="ct-blur"></div>
+  </div>
+
+  <!-- Logo top left -->
+  <div class="logo-placeholder" id="logo" title="cust*m Tab">
+    <img src="custmTab-logo.svg" alt="cust*m Tab">
+  </div>
+
+  <!-- Settings link top right -->
+  <a class="settings-link" id="settings-link" href="#" title="Einstellungen">&#9881; Einstellungen</a>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard-container" id="dashboard">
+    <div class="clock-block">
+      <div class="greeting" id="greeting">Hallo</div>
+      <div class="clock" id="clock">--:--</div>
+      <div class="date-line" id="date-line"></div>
+    </div>
+
+    <!-- Search + engine picker -->
+    <form class="search-form" id="search-form" autocomplete="off">
+      <div class="search-shell">
+        <div class="engine-picker" id="engine-picker">
+          <button type="button" class="engine-current" id="engine-current" title="Suchmaschine wählen">
+            <span class="engine-icon" id="engine-icon">🦆</span>
+            <span class="engine-caret">▾</span>
+          </button>
+          <div class="engine-menu" id="engine-menu" hidden></div>
+        </div>
+        <input type="text" id="search-input" class="search-input"
+               placeholder="Suchen oder URL eingeben…" autocomplete="off" spellcheck="false">
+      </div>
+    </form>
+
+    <!-- Bookmarks -->
+    <div class="shortcut-grid" id="shortcuts-grid"></div>
+  </div>
+
+  <!-- Add / edit bookmark modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-card">
+      <h2 id="modal-title">Lesezeichen hinzufügen</h2>
+      <input type="text" id="bookmark-name" class="ct-input" placeholder="Name (z. B. YouTube)">
+      <input type="text" id="bookmark-url" class="ct-input" placeholder="URL (z. B. youtube.com)">
+      <div class="modal-btns">
+        <button class="ct-btn-ghost" id="modal-cancel">Abbrechen</button>
+        <button class="ct-btn-primary" id="modal-save">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="search-engines.js"></script>
+  <script src="store.js"></script>
+  <script src="newtab.js"></script>
+</body>
+</html>

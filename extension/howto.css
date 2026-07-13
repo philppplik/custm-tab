@@ -1,0 +1,197 @@
+/* ============================================================
+   cust*m Tab — How-to page styles (uses shared.css vars)
+   ============================================================ */
+.ct-page {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.doc-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.doc-header__logo {
+  width: 36px;
+  height: 36px;
+}
+.doc-header__title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  flex: 1;
+}
+.doc-header__subtitle {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--ct-text-dim);
+  margin-left: 8px;
+}
+.btn-back {
+  background: transparent;
+  border: 1px solid var(--ct-glass-border-soft);
+  color: var(--ct-text);
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--ct-font);
+  transition: 0.2s;
+}
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.doc-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.doc-nav a {
+  font-size: 0.85rem;
+  color: var(--ct-text-dim);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--ct-glass-card);
+  border: 1px solid var(--ct-glass-border-soft);
+  transition: 0.2s;
+}
+.doc-nav a:hover {
+  color: var(--ct-text);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.doc-section {
+  background: var(--ct-glass-card);
+  border: 1px solid var(--ct-glass-border);
+  border-radius: var(--ct-radius-md);
+  padding: 26px;
+  margin-bottom: 16px;
+  box-shadow: var(--ct-shadow-md);
+}
+.doc-section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 14px;
+}
+.doc-section h3 {
+  font-size: 1rem;
+  margin: 18px 0 8px;
+  color: var(--ct-text);
+}
+.doc-section p {
+  font-size: 0.88rem;
+  color: var(--ct-text-dim);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.step-list {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+}
+.step-list > li {
+  position: relative;
+  padding: 0 0 16px 44px;
+  counter-increment: step;
+}
+.step-list > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--ct-accent);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.step-body strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 3px;
+}
+.step-body span {
+  font-size: 0.85rem;
+  color: var(--ct-text-dim);
+  line-height: 1.5;
+}
+
+code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+:root[data-theme="light"] code {
+  background: rgba(27, 19, 43, 0.08);
+}
+
+.note {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: var(--ct-radius-sm);
+  background: rgba(237, 211, 15, 0.12);
+  border: 1px solid rgba(237, 211, 15, 0.3);
+}
+.note-icon {
+  flex-shrink: 0;
+}
+.note p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--ct-text);
+}
+
+.mode-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 0.85rem;
+}
+.mode-table th,
+.mode-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ct-glass-border-soft);
+}
+.mode-table th {
+  color: var(--ct-text);
+  font-weight: 600;
+}
+.mode-table td {
+  color: var(--ct-text-dim);
+}
+
+.faq-item {
+  border-top: 1px solid var(--ct-glass-border-soft);
+  padding: 12px 0;
+}
+.faq-item summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.faq-chevron {
+  transition: 0.2s;
+}
+.faq-item[open] .faq-chevron {
+  transform: rotate(90deg);
+}
+.faq-body {
+  margin-top: 10px;
+}
+.faq-body p {
+  margin-bottom: 8px;
+}

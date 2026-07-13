@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cust*m Tab — Einstellungen</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="ct-ambient" aria-hidden="true">
+    <div class="e e-purple"></div>
+    <div class="e e-red"></div>
+    <div class="e e-yellow"></div>
+    <div class="ct-blur"></div>
+  </div>
+
+  <div class="ct-page">
+    <header class="app-header">
+      <img class="app-header__logo" src="custmTab-logo.svg" alt="cust*m Tab">
+      <span class="app-header__title">cust*m Tab</span>
+      <span id="status-badge" class="status-badge status-badge--inactive">● Nicht konfiguriert</span>
+      <button id="theme-toggle" class="theme-toggle" title="Theme">◐</button>
+    </header>
+
+    <main class="main">
+      <!-- Onboarding banner -->
+      <div id="onboarding-banner" class="banner banner--welcome" hidden>
+        <div class="banner__icon">👋</div>
+        <div class="banner__body">
+          <strong>Willkommen bei cust*m Tab</strong>
+          <p>Deine neue Tab-Seite ist startklar. Wähle unten den Modus und richte alles in under 30 Sekunden ein.</p>
+        </div>
+        <button id="btn-dismiss-onboarding" class="banner__dismiss" aria-label="Schließen">✕</button>
+      </div>
+
+      <!-- Mode card -->
+      <section class="ct-card mode-card">
+        <h2 class="card-title">Modus</h2>
+        <div class="mode-toggle">
+          <button class="mode-opt" data-mode="dashboard" id="mode-dashboard">
+            <span class="mode-opt__icon">🧭</span>
+            <span class="mode-opt__label">Dashboard</span>
+            <span class="mode-opt__hint">Lesezeichen, Suche &amp; Uhr</span>
+          </button>
+          <button class="mode-opt" data-mode="redirect" id="mode-redirect">
+            <span class="mode-opt__icon">↗</span>
+            <span class="mode-opt__label">Eigene URL</span>
+            <span class="mode-opt__hint">Seite als New Tab laden</span>
+          </button>
+        </div>
+
+        <!-- redirect sub-settings -->
+        <div id="redirect-settings" class="sub-settings" hidden>
+          <div class="field">
+            <label class="field__label" for="url-input">Deine New-Tab-URL</label>
+            <div class="input-wrapper">
+              <input type="text" id="url-input" class="ct-input url-input"
+                     placeholder="https://notion.so  oder  file:///…/dashboard.html"
+                     autocomplete="off" spellcheck="false">
+              <span id="url-status-icon" class="url-status-icon" aria-live="polite"></span>
+            </div>
+            <p id="url-hint" class="field__hint" aria-live="polite"></p>
+          </div>
+          <label class="toggle-row">
+            <input type="checkbox" id="toggle-mask-url" class="toggle-checkbox">
+            <span class="toggle-label">
+              URL in Adressleiste verbergen
+              <span class="toggle-hint">Per iframe — manche Seiten blocken das</span>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Search engine card -->
+      <section class="ct-card">
+        <h2 class="card-title">Suchmaschine</h2>
+        <p class="card-sub">Standard-Suche für die Dashboard-Leiste.</p>
+        <div class="field">
+          <select id="engine-select" class="ct-input"></select>
+        </div>
+        <details class="details-block">
+          <summary class="details-block__summary">
+            <span>Datenschutz-Hinweis</span><span class="details-block__caret">›</span>
+          </summary>
+          <div class="details-block__body">
+            <p>Wir setzen standardmäßig auf datenschutzfreundliche Suchen (DuckDuckGo, Brave). „Tracking" markiert Anbieter mit Profilbildung/Verfolgung. Deine Eingabe verlässt das Feld nie ohne deinen Klick.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- Appearance card -->
+      <section class="ct-card">
+        <h2 class="card-title">Erscheinungsbild</h2>
+        <div class="theme-row">
+          <button class="theme-chip" data-theme="auto">◐ Auto</button>
+          <button class="theme-chip" data-theme="light">☀ Hell</button>
+          <button class="theme-chip" data-theme="dark">☾ Dunkel</button>
+        </div>
+      </section>
+
+      <!-- Local file guide -->
+      <section class="ct-card card--secondary">
+        <details class="details-block">
+          <summary class="details-block__summary">
+            <span>Lokale Datei verwenden?</span><span class="details-block__caret">›</span>
+          </summary>
+          <div class="details-block__body">
+            <ol class="guide-steps">
+              <li>Öffne <a href="chrome://extensions" target="_blank" rel="noopener">chrome://extensions</a></li>
+              <li>Finde <strong>cust*m Tab</strong> → klicke <em>Details</em></li>
+              <li>Aktiviere <em>„Zugriff auf Datei-URLs erlauben"</em></li>
+              <li>Trage einen Pfad wie <code>file:///C:/Users/du/page.html</code> ein</li>
+            </ol>
+            <p class="guide-note">Chrome beschränkt <code>file://</code>-Zugriff aus Sicherheitsgründen. Einmalig einrichten.</p>
+          </div>
+        </details>
+      </section>
+
+      <div class="page-actions">
+        <button id="btn-save" class="ct-btn-primary">Speichern</button>
+        <span id="save-feedback" class="save-feedback" aria-live="polite"></span>
+        <button id="btn-howto" class="ct-btn-ghost">Anleitung öffnen</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="search-engines.js"></script>
+  <script src="store.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cust*m Tab — Einrichtung</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="wizard.css">
+</head>
+<body>
+  <div class="ct-ambient" aria-hidden="true">
+    <div class="e e-purple"></div>
+    <div class="e e-red"></div>
+    <div class="e e-yellow"></div>
+    <div class="ct-blur"></div>
+  </div>
+
+  <div class="ct-page wizard-page">
+    <!-- progress -->
+    <div class="wiz-progress" id="wiz-progress"></div>
+
+    <div class="wiz-card">
+      <!-- Step 1: Welcome / Mode -->
+      <section class="wiz-step" data-step="0">
+        <div class="wiz-logo"><img src="custmTab-logo.svg" alt="cust*m Tab"></div>
+        <h1 class="wiz-title">Willkommen bei cust*m Tab</h1>
+        <p class="wiz-lead">Deine New-Tab-Seite. Deine Regeln. Richten wir in 30 Sekunden ein.</p>
+        <div class="mode-toggle">
+          <button class="mode-opt active" data-mode="dashboard" data-wiz-mode>
+            <span class="mode-opt__icon">🧭</span>
+            <span class="mode-opt__label">Dashboard</span>
+            <span class="mode-opt__hint">Lesezeichen, Suche &amp; Uhr</span>
+          </button>
+          <button class="mode-opt" data-mode="redirect" data-wiz-mode>
+            <span class="mode-opt__icon">↗</span>
+            <span class="mode-opt__label">Eigene URL</span>
+            <span class="mode-opt__hint">Seite als New Tab laden</span>
+          </button>
+        </div>
+        <div id="wiz-redirect" class="wiz-redirect" hidden>
+          <input type="text" id="wiz-url" class="ct-input" placeholder="https://deine-seite.de">
+        </div>
+      </section>
+
+      <!-- Step 2: Bookmarks -->
+      <section class="wiz-step" data-step="1" hidden>
+        <h2 class="wiz-title">Lesezeichen</h2>
+        <p class="wiz-lead">Füge deine Lieblingsseiten hinzu. Du kannst später jederzeit weitere setzen.</p>
+        <div id="wiz-bookmarks" class="wiz-bookmarks"></div>
+        <button class="wiz-add" id="wiz-add-bm">+ Lesezeichen hinzufügen</button>
+      </section>
+
+      <!-- Step 3: Search engine -->
+      <section class="wiz-step" data-step="2" hidden>
+        <h2 class="wiz-title">Suchmaschine</h2>
+        <p class="wiz-lead">Privat bleiben? Wir empfehlen datenschutzfreundliche Suchen.</p>
+        <div id="wiz-engines" class="wiz-engines"></div>
+      </section>
+
+      <!-- Step 4: Appearance + done -->
+      <section class="wiz-step" data-step="3" hidden>
+        <h2 class="wiz-title">Erscheinungsbild</h2>
+        <p class="wiz-lead">Wähle dein Theme. Fertig!</p>
+        <div class="theme-row">
+          <button class="theme-chip active" data-wiz-theme="auto">◐ Auto</button>
+          <button class="theme-chip" data-wiz-theme="light">☀ Hell</button>
+          <button class="theme-chip" data-wiz-theme="dark">☾ Dunkel</button>
+        </div>
+      </section>
+
+      <!-- nav -->
+      <div class="wiz-nav">
+        <button class="ct-btn-ghost" id="wiz-back" hidden>Zurück</button>
+        <button class="ct-btn-primary" id="wiz-next">Weiter</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="search-engines.js"></script>
+  <script src="store.js"></script>
+  <script src="wizard.js"></script>
+</body>
+</html>
