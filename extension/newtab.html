@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="newtab.css" />
   </head>
   <body>
-    <!-- Redirect mode: full-screen iframe (target URL embedded) -->
+    <!-- Redirect mode: full-screen frame holding the user's target URL -->
     <div id="redirect-frame-wrap" class="redirect-frame-wrap" hidden>
       <iframe
         id="redirect-frame"
@@ -17,7 +17,7 @@
       ></iframe>
     </div>
 
-    <!-- Ambient gradient background (shared) -->
+    <!-- Ambient gradient background -->
     <div class="ct-ambient" aria-hidden="true">
       <div class="e e-purple"></div>
       <div class="e e-red"></div>
@@ -25,77 +25,98 @@
       <div class="ct-blur"></div>
     </div>
 
-    <!-- Logo top left -->
-    <div class="logo-placeholder" id="logo" title="cust*m Tab">
-      <img src="custmTab-logo.svg" alt="cust*m Tab" />
-    </div>
-
-    <!-- Settings link top right -->
-    <a class="settings-link" id="settings-link" href="#" title="Einstellungen"
-      >&#9881; Einstellungen</a
+    <button
+      class="logo-placeholder"
+      id="logo"
+      type="button"
+      title="cust*m Tab settings"
+      aria-label="Open cust*m Tab settings"
     >
+      <img src="custmTab-logo.svg" alt="" />
+    </button>
+
+    <a class="settings-link" id="settings-link" href="#" title="Settings">
+      &#9881; Settings
+    </a>
 
     <!-- DASHBOARD -->
-    <div class="dashboard-container" id="dashboard">
+    <main class="dashboard-container" id="dashboard">
       <div class="clock-block">
-        <div class="greeting" id="greeting">Hallo</div>
-        <div class="clock" id="clock">--:--</div>
+        <div class="greeting" id="greeting">Hello</div>
+        <div class="clock" id="clock" aria-live="off">--:--</div>
         <div class="date-line" id="date-line"></div>
       </div>
 
-      <!-- Search + engine picker -->
-      <form class="search-form" id="search-form" autocomplete="off">
+      <form class="search-form" id="search-form" autocomplete="off" role="search">
         <div class="search-shell">
           <div class="engine-picker" id="engine-picker">
             <button
               type="button"
               class="engine-current"
               id="engine-current"
-              title="Suchmaschine wählen"
+              title="Choose search engine"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="engine-menu"
             >
               <span class="engine-icon" id="engine-icon">🦆</span>
-              <span class="engine-caret">▾</span>
+              <span class="engine-caret" aria-hidden="true">▾</span>
             </button>
-            <div class="engine-menu" id="engine-menu" hidden></div>
+            <div class="engine-menu" id="engine-menu" role="listbox" hidden></div>
           </div>
           <input
             type="text"
             id="search-input"
             class="search-input"
-            placeholder="Suchen oder URL eingeben…"
+            placeholder="Search or enter a URL…"
+            aria-label="Search or enter a URL"
             autocomplete="off"
             spellcheck="false"
           />
         </div>
       </form>
 
-      <!-- Bookmarks -->
       <div class="shortcut-grid" id="shortcuts-grid"></div>
-    </div>
+    </main>
 
-    <!-- Add / edit bookmark modal -->
-    <div class="modal-overlay" id="modal-overlay">
+    <!-- Add / edit bookmark -->
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
       <div class="modal-card">
-        <h2 id="modal-title">Lesezeichen hinzufügen</h2>
+        <h2 id="modal-title">Add bookmark</h2>
         <input
           type="text"
           id="bookmark-name"
           class="ct-input"
-          placeholder="Name (z. B. YouTube)"
+          placeholder="Name (e.g. YouTube)"
+          aria-label="Bookmark name"
         />
         <input
           type="text"
           id="bookmark-url"
           class="ct-input"
-          placeholder="URL (z. B. youtube.com)"
+          placeholder="URL (e.g. youtube.com)"
+          aria-label="Bookmark URL"
+          spellcheck="false"
         />
+        <p id="modal-error" class="modal-error" role="alert" hidden></p>
         <div class="modal-btns">
-          <button class="ct-btn-ghost" id="modal-cancel">Abbrechen</button>
-          <button class="ct-btn-primary" id="modal-save">Speichern</button>
+          <button type="button" class="ct-btn-ghost" id="modal-cancel">Cancel</button>
+          <button type="button" class="ct-btn-primary" id="modal-save">Save</button>
         </div>
       </div>
     </div>
 
+    <!-- Load order matters: compat.js defines CUSTM_API, which store.js needs. -->
+    <script src="compat.js"></script>
+    <script src="url.js"></script>
+    <script src="dom.js"></script>
+    <script src="favicon.js"></script>
     <script src="search-engines.js"></script>
     <script src="store.js"></script>
     <script src="newtab.js"></script>

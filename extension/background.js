@@ -8,11 +8,13 @@
  *    to have been disabled by Chrome.
  *  - Toolbar icon opens the options page.
  *
- * Storage schema (chrome.storage.local):
+ * Storage schema (api.storage.local):
  *  mode, targetUrl, bookmarks[], searchEngine, maskUrl,
  *  theme, onboardingDone, lastSeen, browserLastStartup, lastNotified
  * See store.js for the canonical defaults.
  */
+
+const api = globalThis.browser ?? globalThis.chrome;
 
 const ALARM_PERSISTENCE = 'persistenceCheck';
 const NOTIFICATION_ID = 'custmtab-persistence';
@@ -20,27 +22,27 @@ const STARTUP_GRACE_MS = 2 * 60 * 60 * 1000; // 2h
 const NOTIFY_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h
 
 // ── Install / Update ──────────────────────────────
-chrome.runtime.onInstalled.addListener(async (details) => {
+api.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install') {
     // First run → open the wizard so the user configures the tab immediately.
-    await chrome.tabs.create({
-      url: chrome.runtime.getURL('wizard.html'),
+    await api.tabs.create({
+      url: api.runtime.getURL('wizard.html'),
     });
-    await chrome.storage.local.set({ onboardingDone: false });
+    await api.storage.local.set({ onboardingDone: false });
   }
   // (Re-)create the persistence alarm; alarms are cleared on SW update.
-  await chrome.alarms.create(ALARM_PERSISTENCE, { periodInMinutes: 60 });
+  await api.alarms.create(ALARM_PERSISTENCE, { periodInMinutes: 60 });
 });
 
 // ── Startup ───────────────────────────────────────
-chrome.runtime.onStartup.addListener(async () => {
-  await chrome.storage.local.set({ browserLastStartup: Date.now() });
+api.runtime.onStartup.addListener(async () => {
+  await api.storage.local.set({ browserLastStartup: Date.now() });
 });
 
 // ── Persistence check ─────────────────────────────
 async function checkPersistence() {
   const { targetUrl, lastSeen, browserLastStartup, lastNotified } =
-    await chrome.storage.local.get([
+    await api.storage.local.get([
       'targetUrl',
       'lastSeen',
       'browserLastStartup',
@@ -57,32 +59,32 @@ async function checkPersistence() {
   if (startupTooLongAgo && noNewTabSinceStartup) {
     const cooldownExpired = !lastNotified || now - lastNotified > NOTIFY_COOLDOWN_MS;
     if (cooldownExpired) {
-      await chrome.notifications.create(NOTIFICATION_ID, {
+      await api.notifications.create(NOTIFICATION_ID, {
         type: 'basic',
         iconUrl: 'icons/icon128.png',
         title: 'cust*m Tab — Check required',
         message:
           'Your new tab override may have been disabled. Open a new tab to verify.',
       });
-      await chrome.storage.local.set({ lastNotified: now });
+      await api.storage.local.set({ lastNotified: now });
     }
   }
 }
 
-chrome.alarms.onAlarm.addListener(async (alarm) => {
+api.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === ALARM_PERSISTENCE) await checkPersistence();
 });
 
-chrome.notifications.onClicked.addListener(async (notificationId) => {
+api.notifications.onClicked.addListener(async (notificationId) => {
   if (notificationId === NOTIFICATION_ID) {
-    await chrome.runtime.openOptionsPage();
-    await chrome.notifications.clear(NOTIFICATION_ID);
+    await api.runtime.openOptionsPage();
+    await api.notifications.clear(NOTIFICATION_ID);
   }
 });
 
 // ── Toolbar icon → options ────────────────────────
-chrome.action.onClicked.addListener(() => {
-  chrome.runtime.openOptionsPage();
+api.action.onClicked.addListener(() => {
+  api.runtime.openOptionsPage();
 });
 
 // ── Omnibox search (keyword: "ct") ────────────────
@@ -105,7 +107,7 @@ const OMNIBOX = {
   lastInput: '',
 };
 
-chrome.omnibox.onInputChanged.addListener((text, suggest) => {
+api.omnibox.onInputChanged.addListener((text, suggest) => {
   OMNIBOX.lastInput = text || '';
   try {
     const engines = self.CUSTM_ENGINES.top();
@@ -119,7 +121,7 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   } catch {}
 });
 
-chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
+api.omnibox.onInputEntered.addListener(async (text, disposition) => {
   let engineId = null;
   let query = text;
   const parts = (text || '').trim().split(/\s+/);
@@ -131,21 +133,21 @@ chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
     }
   } catch {}
   if (!engineId) {
-    const s = await chrome.storage.local.get(['searchEngine']);
+    const s = await api.storage.local.get(['searchEngine']);
     engineId = s.searchEngine || 'duckduckgo';
     query = text;
   }
   const url = self.CUSTM_ENGINES.buildUrl(engineId, query);
 
   if (disposition === 'newForegroundTab') {
-    chrome.tabs.create({ url });
+    api.tabs.create({ url });
   } else if (disposition === 'newBackgroundTab') {
-    chrome.tabs.create({ url, active: false });
+    api.tabs.create({ url, active: false });
   } else {
-    chrome.tabs.update({ url });
+    api.tabs.update({ url });
   }
 });
 
-chrome.omnibox.setDefaultSuggestion({
+api.omnibox.setDefaultSuggestion({
   description: 'cust*m Tab — Suche mit deiner Standard-Suchmaschine',
 });
