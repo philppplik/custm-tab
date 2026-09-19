@@ -1,0 +1,53 @@
+name: Feature request
+description: Suggest a way to give users more control over their tab.
+labels: [enhancement, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        cust*m Tab's premise is **your tab, your rules**. The strongest requests
+        describe a thing you cannot currently control, not a thing you want us
+        to decide for you.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the situation, not the solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area?
+      options:
+        - New tab dashboard
+        - Backgrounds
+        - Settings page
+        - Onboarding wizard
+        - Omnibox search
+        - Sync / import / export
+        - Accessibility
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Does this fit the project's constraints?
+      description: >
+        These are hard constraints. A request that breaks one can still be
+        useful, but say so explicitly.
+      options:
+        - label: It needs no new always-on manifest permission.
+        - label: It sends no data anywhere without an explicit user action.
+        - label: It works in both Chrome and Firefox.
