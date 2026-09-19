@@ -130,7 +130,9 @@
           },
         },
         [
-          dom.el('span', { text: engine.icon }),
+          dom.el('span', { class: 'wiz-engine__icon' }, [
+            window.CUSTM_ICONS.engineIcon(engine.id),
+          ]),
           dom.el('span', { text: engine.name }),
           dom.el('span', { class: `e-priv ${engine.privacy}`, text: engine.privacy }),
         ]

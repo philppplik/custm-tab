@@ -136,19 +136,31 @@
     return node;
   }
 
-  /** Create an inline SVG icon from one or more path definitions. */
+  /**
+   * Create an inline SVG icon from one or more path definitions.
+   *
+   * Two shapes of icon live in this app and they need opposite defaults:
+   * interface glyphs are drawn as strokes, while the vendored brand marks in
+   * `icons.js` are solid silhouettes that disappear entirely when stroked.
+   * `fill: true` switches to the filled treatment. Either way the icon paints
+   * in `currentColor`, so one mark works on light, dark and photo backgrounds.
+   */
   function svg(paths, options = {}) {
-    const { size = 16, viewBox = '0 0 24 24', className = '' } = options;
+    const { size = 16, viewBox = '0 0 24 24', className = '', fill = false } = options;
     const NS = 'http://www.w3.org/2000/svg';
     const root = document.createElementNS(NS, 'svg');
     root.setAttribute('viewBox', viewBox);
     root.setAttribute('width', String(size));
     root.setAttribute('height', String(size));
-    root.setAttribute('fill', 'none');
-    root.setAttribute('stroke', 'currentColor');
-    root.setAttribute('stroke-width', '2');
-    root.setAttribute('stroke-linecap', 'round');
-    root.setAttribute('stroke-linejoin', 'round');
+    if (fill) {
+      root.setAttribute('fill', 'currentColor');
+    } else {
+      root.setAttribute('fill', 'none');
+      root.setAttribute('stroke', 'currentColor');
+      root.setAttribute('stroke-width', '2');
+      root.setAttribute('stroke-linecap', 'round');
+      root.setAttribute('stroke-linejoin', 'round');
+    }
     root.setAttribute('aria-hidden', 'true');
     if (className) root.setAttribute('class', className);
 
