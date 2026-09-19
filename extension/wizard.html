@@ -86,9 +86,15 @@
         </div>
       </div>
     </div>
+    <!-- favicon.js and appearance.js are here for store.js, which normalises
+         through both at read time; without them the wizard would write back
+         settings every other page would have cleaned up. -->
     <script src="compat.js"></script>
     <script src="url.js"></script>
     <script src="dom.js"></script>
+    <script src="icons.js"></script>
+    <script src="favicon.js"></script>
+    <script src="appearance.js"></script>
     <script src="search-engines.js"></script>
     <script src="store.js"></script>
     <script src="wizard.js"></script>
