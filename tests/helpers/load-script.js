@@ -1,45 +1,45 @@
 /**
  * Load an extension source file into the current test global.
  *
- * The extension ships classic scripts that attach themselves to `window`
- * (`window.CUSTM_STORE`, `window.CUSTM_ENGINES`, ...) rather than ES modules,
- * because it runs with no build step. They therefore cannot be `import`ed.
+ * The extension ships classic scripts that attach themselves to the global
+ * (`window.CUSTM_STORE`, `self.CUSTM_ENGINES`, ...) rather than exporting ES
+ * modules, because it runs with no build step. They therefore cannot be
+ * imported for their exports — there are none.
  *
- * This evaluates the real file — not a copy — so a test failure means the
- * shipped code is wrong, and a rename of the file is caught immediately.
+ * They can, however, be imported for their side effects. A file with no
+ * `export` is still a valid module, and its top-level IIFE still assigns to
+ * `window`. Going through `import()` rather than `eval()` matters: the module
+ * graph is what Vite transforms and what the V8 coverage provider can attribute
+ * lines to. Code evaluated with `eval` is invisible to coverage, which silently
+ * reports 0% and fails the threshold.
+ *
+ * A cache-busting query gives each call a fresh evaluation, so one test cannot
+ * inherit global state from another.
  */
 import { readFileSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const EXT = join(ROOT, 'extension');
 
-const cache = new Map();
+let evaluation = 0;
 
 /**
- * Evaluate `extension/<name>` in the global scope.
+ * Evaluate `extension/<name>` for its side effects.
  *
  * @param {string} name File name relative to `extension/`, e.g. `'store.js'`.
- * @returns {typeof globalThis} The global the script attached itself to.
+ * @returns {Promise<typeof globalThis>} The global the script attached itself to.
  */
-export function loadScript(name) {
-  if (!cache.has(name)) {
-    cache.set(name, readFileSync(join(EXT, name), 'utf8'));
-  }
-  const source = cache.get(name);
-
-  // Indirect eval runs in global scope, which is exactly what a <script> tag
-  // does. The input is a repository file, never user or network data.
-
-  (0, eval)(source);
-
+export async function loadScript(name) {
+  const url = `${pathToFileURL(join(EXT, name)).href}?evaluation=${++evaluation}`;
+  await import(/* @vite-ignore */ url);
   return globalThis;
 }
 
 /** Load several scripts in order, mirroring the <script> order of a page. */
-export function loadScripts(...names) {
-  for (const name of names) loadScript(name);
+export async function loadScripts(...names) {
+  for (const name of names) await loadScript(name);
   return globalThis;
 }
 

@@ -4,8 +4,8 @@ import { loadScript } from './helpers/load-script.js';
 describe('CUSTM_ENGINES registry', () => {
   let engines;
 
-  beforeEach(() => {
-    loadScript('search-engines.js');
+  beforeEach(async () => {
+    await loadScript('search-engines.js');
     engines = globalThis.CUSTM_ENGINES;
   });
 
