@@ -4,8 +4,8 @@ import { loadScript } from './helpers/load-script.js';
 describe('CUSTM_STORE', () => {
   let store;
 
-  beforeEach(() => {
-    loadScript('store.js');
+  beforeEach(async () => {
+    await loadScript('store.js');
     store = globalThis.CUSTM_STORE;
   });
 
