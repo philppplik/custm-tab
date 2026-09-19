@@ -98,7 +98,7 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/dependency-review-action@v4
+      - uses: actions/dependency-review-action@v5
         # The action errors out unless the repository's Dependency graph is
         # enabled under Settings → Code security. Until that is switched on,
         # a hard failure here would block every PR for a reason unrelated to
