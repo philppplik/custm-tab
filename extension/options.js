@@ -5,6 +5,9 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
+  const api = window.CUSTM_API;
+  const urls = window.CUSTM_URL;
+  const store = window.CUSTM_STORE;
 
   const urlInput = $('url-input');
   const urlStatusIcon = $('url-status-icon');
@@ -22,6 +25,8 @@
   const onboardingBanner = $('onboarding-banner');
   const btnDismissOnboard = $('btn-dismiss-onboarding');
   const syncToggle = $('toggle-sync');
+  const iconModeSelect = $('icon-mode-select');
+  const iconModeNote = $('icon-mode-note');
 
   let currentTheme = 'auto';
   let currentMode = 'dashboard';
@@ -61,9 +66,9 @@
       opt.value = e.id;
       const tag =
         e.privacy === 'high'
-          ? ' (privat)'
+          ? ' (private)'
           : e.privacy === 'medium'
-            ? ' (mittel)'
+            ? ' (mixed)'
             : ' (tracking)';
       opt.textContent = `${e.icon} ${e.name}${tag}`;
       if (e.id === selectedId) opt.selected = true;
@@ -97,40 +102,55 @@
     urlStatusIcon.textContent = icon;
   }
 
+  const URL_ERRORS = {
+    urlEmpty: 'Enter a URL.',
+    urlMalformed: 'That does not look like a valid URL.',
+    urlUnsafeProtocol: 'Only http, https, file and extension URLs are allowed.',
+    urlNoHost: 'That URL is missing a hostname.',
+  };
+
+  /**
+   * Validate the redirect target.
+   *
+   * Goes through CUSTM_URL rather than a bare `new URL()`: parsing succeeding
+   * is not the same as being safe to navigate to, and `javascript:` parses.
+   */
   async function validateUrl(value) {
-    const trimmed = value.trim();
-    if (!trimmed) {
+    if (!String(value || '').trim()) {
       setInputState('empty', '', '');
       return 'empty';
     }
-    if (trimmed.startsWith('file://')) {
+
+    const target = urls.normalizeTargetUrl(value);
+    if (!target.ok) {
+      setInputState('invalid', URL_ERRORS[target.reason] || URL_ERRORS.urlMalformed, '✗');
+      return 'invalid';
+    }
+
+    if (target.kind === 'file') {
+      // Chrome and Firefox both gate file:// behind a per-extension switch the
+      // user has to flip themselves; warn rather than pretend it will work.
       let allowed = false;
       try {
-        allowed = await new Promise((res) =>
-          chrome.extension.isAllowedFileSchemeAccess(res)
-        );
+        allowed = await api.extension.isAllowedFileSchemeAccess();
       } catch {
         allowed = false;
       }
       if (allowed) {
-        setInputState('valid', 'Lokale Datei — Zugriff aktiv ✓', '✓');
+        setInputState('valid', 'Local file — access granted ✓', '✓');
         return 'valid';
       }
-      setInputState('warning', 'Dateizugriff nicht aktiv — siehe unten', '⚠');
+      setInputState('warning', 'File access is off — see the guide below', '⚠');
       return 'warning';
     }
-    if (trimmed.startsWith('chrome-extension://')) {
-      setInputState('valid', 'Extension-URL ✓', '✓');
+
+    if (target.kind === 'extension') {
+      setInputState('valid', 'Extension page ✓', '✓');
       return 'valid';
     }
-    try {
-      new URL(trimmed);
-      setInputState('valid', 'Sieht gut aus ✓', '✓');
-      return 'valid';
-    } catch {
-      setInputState('invalid', 'Keine gültige URL', '✗');
-      return 'invalid';
-    }
+
+    setInputState('valid', 'Looks good ✓', '✓');
+    return 'valid';
   }
 
   urlInput.addEventListener('input', () => {
@@ -141,10 +161,10 @@
   /* ── Status badge ─────────────────────────────── */
   function updateStatusBadge(active) {
     if (active) {
-      statusBadge.textContent = '● Aktiv';
+      statusBadge.textContent = '● Active';
       statusBadge.className = 'status-badge status-badge--active';
     } else {
-      statusBadge.textContent = '● Nicht konfiguriert';
+      statusBadge.textContent = '● Not configured';
       statusBadge.className = 'status-badge status-badge--inactive';
     }
   }
@@ -152,7 +172,7 @@
   /* ── Save feedback ────────────────────────────── */
   let fbTimer = null;
   function showSaveFeedback() {
-    saveFeedback.textContent = 'Gespeichert ✓';
+    saveFeedback.textContent = 'Saved ✓';
     saveFeedback.classList.add('save-feedback--visible');
     if (fbTimer) clearTimeout(fbTimer);
     fbTimer = setTimeout(() => {
@@ -162,7 +182,7 @@
   }
 
   /* ── Load ─────────────────────────────────────── */
-  const settings = await window.CUSTM_STORE.getAll();
+  const settings = await store.getAll();
   applyMode(settings.mode || 'dashboard');
   applyTheme(settings.theme || 'auto');
   buildEngineSelect(settings.searchEngine || 'duckduckgo');
@@ -174,6 +194,19 @@
   if (settings.targetUrl) await validateUrl(settings.targetUrl);
   syncToggle.checked = settings.syncEnabled === true;
 
+  if (iconModeSelect) {
+    iconModeSelect.value = settings.iconMode;
+    const describeIconMode = () => {
+      iconModeNote.textContent = window.CUSTM_FAVICON.disclosesToThirdParty(
+        iconModeSelect.value
+      )
+        ? 'Sends each bookmark’s hostname to DuckDuckGo. Nothing else is sent.'
+        : 'Resolved on this device. No network request is made.';
+    };
+    describeIconMode();
+    iconModeSelect.addEventListener('change', describeIconMode);
+  }
+
   // Onboarding banner
   const params = new URLSearchParams(location.search);
   if (params.get('onboarding') === 'true' && !settings.onboardingDone) {
@@ -181,7 +214,7 @@
   }
   btnDismissOnboard.addEventListener('click', () => {
     onboardingBanner.hidden = true;
-    chrome.storage.local.set({ onboardingDone: true });
+    api.storage.local.set({ onboardingDone: true });
   });
 
   /* ── Save ─────────────────────────────────────── */
@@ -189,6 +222,7 @@
     const patch = {
       searchEngine: engineSelect.value,
       theme: currentTheme,
+      iconMode: iconModeSelect ? iconModeSelect.value : 'local',
       syncEnabled: syncToggle.checked,
     };
     if (currentMode === 'redirect') {
@@ -196,7 +230,7 @@
       if (state === 'invalid') return;
       Object.assign(patch, {
         mode: 'redirect',
-        targetUrl: urlInput.value.trim(),
+        targetUrl: urls.normalizeTargetUrl(urlInput.value).url || '',
         maskUrl: maskUrlToggle.checked,
       });
       updateStatusBadge(!!urlInput.value.trim());
@@ -204,25 +238,25 @@
       Object.assign(patch, { mode: 'dashboard' });
       updateStatusBadge(true);
     }
-    await window.CUSTM_STORE.set(patch);
+    await store.set(patch);
     if (syncToggle.checked) {
       // best-effort: pull any settings already on other devices
       try {
-        await window.CUSTM_STORE.pullSyncIfEnabled();
+        await store.pullSyncIfEnabled();
       } catch {}
     }
     showSaveFeedback();
   });
 
   syncToggle.addEventListener('change', () =>
-    chrome.storage.local.set({ syncEnabled: syncToggle.checked })
+    api.storage.local.set({ syncEnabled: syncToggle.checked })
   );
 
   maskUrlToggle.addEventListener('change', () =>
-    chrome.storage.local.set({ maskUrl: maskUrlToggle.checked })
+    api.storage.local.set({ maskUrl: maskUrlToggle.checked })
   );
 
   btnHowto.addEventListener('click', () => {
-    chrome.tabs.create({ url: chrome.runtime.getURL('howto.html') });
+    api.tabs.create({ url: api.runtime.getURL('howto.html') });
   });
 })();

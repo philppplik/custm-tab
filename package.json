@@ -22,7 +22,7 @@
     "test:coverage": "vitest run --coverage",
     "validate:manifest": "node scripts/validate-manifest.mjs",
     "build": "node scripts/build.mjs",
-    "lint:ext": "npm run build && web-ext lint --source-dir dist/firefox",
+    "lint:ext": "npm run build && web-ext lint --source-dir dist/firefox --warnings-as-errors",
     "verify": "npm run format:check && npm run lint && npm run validate:manifest && npm run test"
   },
   "devDependencies": {

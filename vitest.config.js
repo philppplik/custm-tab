@@ -11,12 +11,19 @@ export default defineConfig({
       provider: 'v8',
       reportsDirectory: 'coverage',
       reporter: ['text', 'lcov'],
-      // Explicit allowlist rather than a glob. The DOM controllers
-      // (newtab.js, options.js, wizard.js) are page bootstraps that run on
-      // load and are covered by their own DOM tests; listing modules one by
-      // one keeps the threshold meaningful instead of diluted by files that
-      // no unit test can reach. Add each new testable module here.
-      include: ['extension/search-engines.js', 'extension/store.js', 'extension/url.js'],
+      // Explicit allowlist rather than a glob. The page controllers
+      // (newtab.js, options.js, wizard.js) are bootstraps that run on load and
+      // immediately touch the DOM; listing the unit-testable modules one by one
+      // keeps the threshold meaningful instead of diluted by files no unit test
+      // can reach. Add each new testable module here.
+      include: [
+        'extension/compat.js',
+        'extension/dom.js',
+        'extension/favicon.js',
+        'extension/search-engines.js',
+        'extension/store.js',
+        'extension/url.js',
+      ],
       all: true,
       thresholds: {
         lines: 80,

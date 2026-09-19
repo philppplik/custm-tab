@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cust*m Tab — Einstellungen</title>
+    <title>cust*m Tab — Settings</title>
     <link rel="stylesheet" href="shared.css" />
     <link rel="stylesheet" href="options.css" />
   </head>
@@ -20,7 +20,7 @@
         <img class="app-header__logo" src="custmTab-logo.svg" alt="cust*m Tab" />
         <span class="app-header__title">cust*m Tab</span>
         <span id="status-badge" class="status-badge status-badge--inactive"
-          >● Nicht konfiguriert</span
+          >● Not configured</span
         >
         <button id="theme-toggle" class="theme-toggle" title="Theme">◐</button>
       </header>
@@ -30,16 +30,16 @@
         <div id="onboarding-banner" class="banner banner--welcome" hidden>
           <div class="banner__icon">👋</div>
           <div class="banner__body">
-            <strong>Willkommen bei cust*m Tab</strong>
+            <strong>Welcome to cust*m Tab</strong>
             <p>
-              Deine neue Tab-Seite ist startklar. Wähle unten den Modus und richte alles
-              in under 30 Sekunden ein.
+              Your new tab is ready. Pick a mode below and finish setup in under 30
+              seconds.
             </p>
           </div>
           <button
             id="btn-dismiss-onboarding"
             class="banner__dismiss"
-            aria-label="Schließen"
+            aria-label="Dismiss"
           >
             ✕
           </button>
@@ -47,24 +47,24 @@
 
         <!-- Mode card -->
         <section class="ct-card mode-card">
-          <h2 class="card-title">Modus</h2>
+          <h2 class="card-title">Mode</h2>
           <div class="mode-toggle">
             <button class="mode-opt" data-mode="dashboard" id="mode-dashboard">
               <span class="mode-opt__icon">🧭</span>
               <span class="mode-opt__label">Dashboard</span>
-              <span class="mode-opt__hint">Lesezeichen, Suche &amp; Uhr</span>
+              <span class="mode-opt__hint">Bookmarks, search and clock</span>
             </button>
             <button class="mode-opt" data-mode="redirect" id="mode-redirect">
               <span class="mode-opt__icon">↗</span>
-              <span class="mode-opt__label">Eigene URL</span>
-              <span class="mode-opt__hint">Seite als New Tab laden</span>
+              <span class="mode-opt__label">Your own URL</span>
+              <span class="mode-opt__hint">Load a page as the new tab</span>
             </button>
           </div>
 
           <!-- redirect sub-settings -->
           <div id="redirect-settings" class="sub-settings" hidden>
             <div class="field">
-              <label class="field__label" for="url-input">Deine New-Tab-URL</label>
+              <label class="field__label" for="url-input">Your new-tab URL</label>
               <div class="input-wrapper">
                 <input
                   type="text"
@@ -85,8 +85,10 @@
             <label class="toggle-row">
               <input type="checkbox" id="toggle-mask-url" class="toggle-checkbox" />
               <span class="toggle-label">
-                URL in Adressleiste verbergen
-                <span class="toggle-hint">Per iframe — manche Seiten blocken das</span>
+                Hide the URL in the address bar
+                <span class="toggle-hint"
+                  >Uses an iframe — some sites refuse to be embedded</span
+                >
               </span>
             </label>
           </div>
@@ -94,20 +96,20 @@
 
         <!-- Search engine card -->
         <section class="ct-card">
-          <h2 class="card-title">Suchmaschine</h2>
-          <p class="card-sub">Standard-Suche für die Dashboard-Leiste.</p>
+          <h2 class="card-title">Search engine</h2>
+          <p class="card-sub">Default search for the dashboard bar.</p>
           <div class="field">
             <select id="engine-select" class="ct-input"></select>
           </div>
           <details class="details-block">
             <summary class="details-block__summary">
-              <span>Datenschutz-Hinweis</span><span class="details-block__caret">›</span>
+              <span>Privacy note</span><span class="details-block__caret">›</span>
             </summary>
             <div class="details-block__body">
               <p>
-                Wir setzen standardmäßig auf datenschutzfreundliche Suchen (DuckDuckGo,
-                Brave). „Tracking" markiert Anbieter mit Profilbildung/Verfolgung. Deine
-                Eingabe verlässt das Feld nie ohne deinen Klick.
+                Privacy-forward engines lead by default: DuckDuckGo and Brave sit at the
+                top of the list. "Tracking" marks providers that build a profile of you.
+                What you type never leaves the field until you press Enter.
               </p>
             </div>
           </details>
@@ -115,26 +117,64 @@
 
         <!-- Appearance card -->
         <section class="ct-card">
-          <h2 class="card-title">Erscheinungsbild</h2>
+          <h2 class="card-title">Appearance</h2>
           <div class="theme-row">
             <button class="theme-chip" data-theme="auto">◐ Auto</button>
-            <button class="theme-chip" data-theme="light">☀ Hell</button>
-            <button class="theme-chip" data-theme="dark">☾ Dunkel</button>
+            <button class="theme-chip" data-theme="light">☀ Light</button>
+            <button class="theme-chip" data-theme="dark">☾ Dark</button>
           </div>
+        </section>
+
+        <!-- Bookmark icons -->
+        <section class="ct-card">
+          <h2 class="card-title">Bookmark icons</h2>
+          <p class="card-sub">How the tile icons on your dashboard are resolved.</p>
+          <div class="field">
+            <select
+              id="icon-mode-select"
+              class="ct-input"
+              aria-describedby="icon-mode-note"
+            >
+              <option value="local">On this device (recommended)</option>
+              <option value="monogram">Letter tiles only</option>
+              <option value="remote">Fetch from DuckDuckGo</option>
+            </select>
+            <p id="icon-mode-note" class="field__hint" aria-live="polite"></p>
+          </div>
+          <details class="details-block">
+            <summary class="details-block__summary">
+              <span>Why this setting exists</span
+              ><span class="details-block__caret">›</span>
+            </summary>
+            <div class="details-block__body">
+              <p>
+                Earlier versions fetched every tile icon from Google, which handed Google
+                the list of sites you had pinned and a signal every time you opened a tab.
+                That contradicted the privacy promise, so it is gone.
+              </p>
+              <p>
+                <strong>On this device</strong> uses the browser own icon cache in Chrome,
+                and falls back to letter tiles in Firefox, which has no equivalent.
+                <strong>Letter tiles</strong> never touch the network at all.
+                <strong>Fetch from DuckDuckGo</strong> discloses each bookmark hostname
+                and nothing else — path, query and fragment are never sent.
+              </p>
+            </div>
+          </details>
         </section>
 
         <!-- Sync card -->
         <section class="ct-card card--secondary">
           <details class="details-block">
             <summary class="details-block__summary">
-              <span>Einstellungen synchronisieren?</span
+              <span>Sync settings across devices?</span
               ><span class="details-block__caret">›</span>
             </summary>
             <div class="details-block__body">
               <label class="toggle-row">
                 <input type="checkbox" id="toggle-sync" class="toggle-checkbox" />
                 <span class="toggle-label">
-                  Einstellungen geräteübergreifend syncen
+                  Sync settings across devices
                   <span class="toggle-hint"
                     >Modus, Suchmaschine, Design &amp; URL — Lesezeichen bleiben
                     lokal</span
@@ -149,39 +189,38 @@
         <section class="ct-card card--secondary">
           <details class="details-block">
             <summary class="details-block__summary">
-              <span>Lokale Datei verwenden?</span
-              ><span class="details-block__caret">›</span>
+              <span>Using a local file?</span><span class="details-block__caret">›</span>
             </summary>
             <div class="details-block__body">
               <ol class="guide-steps">
                 <li>
-                  Öffne
-                  <a href="chrome://extensions" target="_blank" rel="noopener"
-                    >chrome://extensions</a
-                  >
+                  Open
+                  <code>chrome://extensions</code> (or <code>about:addons</code> in
+                  Firefox)
                 </li>
-                <li>Finde <strong>cust*m Tab</strong> → klicke <em>Details</em></li>
-                <li>Aktiviere <em>„Zugriff auf Datei-URLs erlauben"</em></li>
-                <li>
-                  Trage einen Pfad wie <code>file:///C:/Users/du/page.html</code> ein
-                </li>
+                <li>Find <strong>cust*m Tab</strong> and open its <em>Details</em></li>
+                <li>Turn on <em>"Allow access to file URLs"</em></li>
+                <li>Enter a path such as <code>file:///C:/Users/you/page.html</code></li>
               </ol>
               <p class="guide-note">
-                Chrome beschränkt <code>file://</code>-Zugriff aus Sicherheitsgründen.
-                Einmalig einrichten.
+                Browsers restrict <code>file://</code> access for security reasons. You
+                only need to set this once.
               </p>
             </div>
           </details>
         </section>
 
         <div class="page-actions">
-          <button id="btn-save" class="ct-btn-primary">Speichern</button>
+          <button id="btn-save" class="ct-btn-primary">Save</button>
           <span id="save-feedback" class="save-feedback" aria-live="polite"></span>
-          <button id="btn-howto" class="ct-btn-ghost">Anleitung öffnen</button>
+          <button id="btn-howto" class="ct-btn-ghost">Open the guide</button>
         </div>
       </main>
     </div>
-
+    <script src="compat.js"></script>
+    <script src="url.js"></script>
+    <script src="dom.js"></script>
+    <script src="favicon.js"></script>
     <script src="search-engines.js"></script>
     <script src="store.js"></script>
     <script src="options.js"></script>

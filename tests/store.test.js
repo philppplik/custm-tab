@@ -1,11 +1,13 @@
 import { describe, test, expect, beforeEach } from 'vitest';
-import { loadScript } from './helpers/load-script.js';
+import { loadScripts } from './helpers/load-script.js';
 
 describe('CUSTM_STORE', () => {
   let store;
 
   beforeEach(async () => {
-    await loadScript('store.js');
+    // compat.js defines CUSTM_API and url.js defines CUSTM_URL; store.js
+    // depends on both, exactly as the pages load them.
+    await loadScripts('compat.js', 'url.js', 'store.js');
     store = globalThis.CUSTM_STORE;
   });
 
@@ -145,8 +147,9 @@ describe('CUSTM_STORE', () => {
   describe('getBookmarks', () => {
     test('returns the stored bookmarks', async () => {
       await store.set({ bookmarks: [{ name: 'Example', url: 'https://example.com' }] });
+      // Normalised on read, so the URL comes back in canonical form.
       expect(await store.getBookmarks()).toEqual([
-        { name: 'Example', url: 'https://example.com' },
+        { name: 'Example', url: 'https://example.com/' },
       ]);
     });
 

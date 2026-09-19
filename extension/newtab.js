@@ -1,318 +1,515 @@
 /**
- * cust*m Tab — New Tab Dashboard logic
+ * cust*m Tab — New-tab controller
  *
- * - Redirect mode: loads targetUrl in full-screen iframe (keeps extension
- *   URL in address bar when maskUrl on; otherwise navigates directly).
- * - Dashboard mode: clock, greeting, search (engine picker), bookmarks.
- *   Bookmarks support live edit (modal), delete, and drag-and-drop reorder.
- * Settings come from chrome.storage.local via CUSTM_STORE.
+ * Two experiences, chosen at runtime from persisted settings:
+ *   redirect  — load the user's own URL, optionally inside a full-screen frame
+ *   dashboard — clock, greeting, search with engine picker, bookmark tiles
+ *
+ * Every value rendered here is user-controlled, so nothing reaches the DOM as
+ * markup: elements come from `CUSTM_DOM`, URLs pass `CUSTM_URL` first.
  */
 (function () {
   'use strict';
 
+  const api = window.CUSTM_API;
+  const dom = window.CUSTM_DOM;
+  const urls = window.CUSTM_URL;
+  const store = window.CUSTM_STORE;
+  const engines = window.CUSTM_ENGINES;
+  const favicons = window.CUSTM_FAVICON;
+
   const $ = (id) => document.getElementById(id);
 
-  /* ── Clock + greeting ─────────────────────────── */
+  const CLOCK_INTERVAL_MS = 10000;
+  const GREETING_INTERVAL_MS = 60000;
+  /** How long to wait before offering a direct link when framing looks blocked. */
+  const FRAME_FALLBACK_MS = 2500;
+
+  /** Locale for clock and date. Follows the browser, not a hard-coded region. */
+  const LOCALE = navigator.language || 'en';
+
+  let settings = null;
+  let bookmarks = [];
+  let currentEngine = 'duckduckgo';
+  let dragIndex = null;
+  let editIndex = -1;
+
+  /* ── Theme ─────────────────────────────────────────────────────────────
+   * The new-tab page persisted a `theme` setting and then never applied it,
+   * so the dashboard was always dark regardless of the choice. `auto` has to
+   * be resolved explicitly, because shared.css only defines an override for
+   * data-theme="light" — leaving the attribute off is not "follow the system",
+   * it is "always dark".
+   */
+  const prefersLight =
+    typeof matchMedia === 'function' ? matchMedia('(prefers-color-scheme: light)') : null;
+
+  function resolveTheme(theme) {
+    if (theme === 'light' || theme === 'dark') return theme;
+    return prefersLight && prefersLight.matches ? 'light' : 'dark';
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', resolveTheme(theme));
+  }
+
+  if (prefersLight && typeof prefersLight.addEventListener === 'function') {
+    prefersLight.addEventListener('change', () => {
+      if (!settings || settings.theme === 'auto') applyTheme('auto');
+    });
+  }
+
+  /* ── Clock and greeting ────────────────────────────────────────────── */
   function updateClock() {
     const now = new Date();
-    const clockEl = $('clock');
-    const dateEl = $('date-line');
-    if (clockEl) {
-      clockEl.textContent = now.toLocaleTimeString('de-DE', {
+    const clock = $('clock');
+    const date = $('date-line');
+    if (clock) {
+      clock.textContent = now.toLocaleTimeString(LOCALE, {
         hour: '2-digit',
         minute: '2-digit',
       });
     }
-    if (dateEl) {
-      dateEl.textContent = now.toLocaleDateString('de-DE', {
+    if (date) {
+      date.textContent = now.toLocaleDateString(LOCALE, {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
-        year: 'numeric',
       });
     }
   }
+
+  const GREETINGS = {
+    morning: 'Good morning',
+    afternoon: 'Good afternoon',
+    evening: 'Good evening',
+    night: 'Good night',
+  };
+
+  function greetingKey(hour) {
+    if (hour >= 5 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 17) return 'afternoon';
+    if (hour >= 17 && hour < 22) return 'evening';
+    return 'night';
+  }
+
   function updateGreeting() {
-    const h = new Date().getHours();
-    let g = 'Hallo';
-    if (h >= 5 && h < 12) g = 'Guten Morgen';
-    else if (h >= 12 && h < 17) g = 'Guten Tag';
-    else if (h >= 17 && h < 21) g = 'Guten Abend';
-    else g = 'Gute Nacht';
     const el = $('greeting');
-    if (el) el.textContent = g;
-  }
-  updateClock();
-  updateGreeting();
-  setInterval(updateClock, 10000);
-  setInterval(updateGreeting, 60000);
-
-  /* ── Search + engine picker ───────────────────── */
-  let currentEngine = 'duckduckgo';
-
-  function favicon(url) {
-    try {
-      return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`;
-    } catch {
-      return '';
-    }
+    if (el) el.textContent = GREETINGS[greetingKey(new Date().getHours())];
   }
 
+  /* ── Search ────────────────────────────────────────────────────────── */
   function renderEnginePicker() {
-    const top = window.CUSTM_ENGINES.top();
     const menu = $('engine-menu');
-    menu.innerHTML = '';
-    top.forEach((e) => {
-      const item = document.createElement('div');
-      item.className = 'engine-item';
-      item.innerHTML = `
-        <span>${e.icon}</span>
-        <span class="e-name">${e.name}</span>
-        <span class="e-privacy ${e.privacy}">${
-          e.privacy === 'high' ? 'privat' : e.privacy === 'medium' ? 'mittel' : 'tracking'
-        }</span>`;
-      item.addEventListener('click', () => {
-        currentEngine = e.id;
-        window.CUSTM_STORE.set({ searchEngine: e.id });
-        applyEngineButton();
-        menu.hidden = true;
-      });
-      menu.appendChild(item);
-    });
+    if (!menu) return;
+
+    const items = engines.top().map((engine) =>
+      dom.el(
+        'button',
+        {
+          type: 'button',
+          class: 'engine-item',
+          role: 'option',
+          'aria-selected': String(engine.id === currentEngine),
+          on: {
+            click: async () => {
+              currentEngine = engine.id;
+              await store.set({ searchEngine: engine.id });
+              applyEngineButton();
+              closeEngineMenu();
+              const input = $('search-input');
+              if (input) input.focus();
+            },
+          },
+        },
+        [
+          dom.el('span', { class: 'engine-item__icon', text: engine.icon }),
+          dom.el('span', { class: 'e-name', text: engine.name }),
+          dom.el('span', { class: `e-privacy ${engine.privacy}`, text: engine.privacy }),
+        ]
+      )
+    );
+
+    dom.replace(menu, items);
   }
 
   function applyEngineButton() {
-    const e = window.CUSTM_ENGINES.getById(currentEngine);
-    $('engine-icon').textContent = e.icon;
+    const engine = engines.getById(currentEngine);
+    const icon = $('engine-icon');
+    const button = $('engine-current');
+    if (icon) icon.textContent = engine.icon;
+    if (button) button.setAttribute('aria-label', `Search engine: ${engine.name}`);
+  }
+
+  function closeEngineMenu() {
+    const menu = $('engine-menu');
+    if (menu) menu.hidden = true;
+    const button = $('engine-current');
+    if (button) button.setAttribute('aria-expanded', 'false');
   }
 
   function handleSearch(raw) {
-    const q = (raw || '').trim();
-    if (!q) return;
-    const isUrl =
-      /^(https?:\/\/)/i.test(q) || /^(www\.)/i.test(q) || /\S+\.\S{2,}/.test(q);
-    if (isUrl) {
-      window.location.href = /^https?:\/\//i.test(q) ? q : 'https://' + q;
-    } else {
-      window.location.href = window.CUSTM_ENGINES.buildUrl(currentEngine, q);
+    const query = String(raw || '').trim();
+    if (!query) return;
+
+    // A destination only wins when it is unambiguously one; anything else is
+    // a search, which is the recoverable outcome.
+    if (urls.looksLikeUrl(query)) {
+      const target = urls.normalizeBookmarkUrl(query);
+      if (target.ok) {
+        window.location.href = target.url;
+        return;
+      }
     }
+    window.location.href = engines.buildUrl(currentEngine, query);
   }
 
-  /* ── Bookmarks ────────────────────────────────── */
-  let bookmarks = [];
-  let dragIndex = null;
+  /* ── Bookmarks ─────────────────────────────────────────────────────── */
+
+  /** Build the icon for a tile: a real favicon, or a locally drawn monogram. */
+  function buildIcon(bookmark) {
+    const icon = favicons.resolve(bookmark, settings.iconMode);
+
+    const monogram = (data) =>
+      dom.el('span', {
+        class: 'sc-monogram',
+        text: data.letter,
+        style: { '--tile-hue': String(data.hue) },
+      });
+
+    if (icon.kind === 'monogram') return monogram(icon);
+
+    const image = dom.el('img', {
+      src: icon.src,
+      alt: '',
+      loading: 'lazy',
+      decoding: 'async',
+      width: '32',
+      height: '32',
+    });
+    // A cached favicon can be missing and a remote one can 404; swap in the
+    // monogram rather than leaving a broken-image tile.
+    image.addEventListener('error', () => image.replaceWith(monogram(icon.fallback)));
+    return image;
+  }
+
+  function persistBookmarks() {
+    return store.set({ bookmarks });
+  }
+
+  function buildTile(bookmark, index) {
+    const tile = dom.el('div', {
+      class: 'sc-item',
+      draggable: 'true',
+      dataset: { index: String(index) },
+      on: {
+        dragstart: (event) => {
+          dragIndex = index;
+          tile.classList.add('dragging');
+          event.dataTransfer.effectAllowed = 'move';
+          try {
+            event.dataTransfer.setData('text/plain', String(index));
+          } catch {
+            /* Firefox requires setData; a failure here is not fatal. */
+          }
+        },
+        dragend: () => {
+          tile.classList.remove('dragging');
+          document
+            .querySelectorAll('.sc-item')
+            .forEach((el) => el.classList.remove('drag-over'));
+        },
+        dragover: (event) => {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = 'move';
+          tile.classList.add('drag-over');
+        },
+        dragleave: () => tile.classList.remove('drag-over'),
+        drop: async (event) => {
+          event.preventDefault();
+          tile.classList.remove('drag-over');
+          if (dragIndex === null || dragIndex === index) return;
+          const [moved] = bookmarks.splice(dragIndex, 1);
+          bookmarks.splice(index, 0, moved);
+          dragIndex = null;
+          await persistBookmarks();
+          renderBookmarks();
+        },
+      },
+    });
+
+    // `href` goes through CUSTM_DOM, which drops it unless the protocol is on
+    // the allowlist — so an unsafe stored URL renders as an inert tile.
+    const link = dom.el('a', {
+      class: 'full-link',
+      href: bookmark.url,
+      rel: 'noopener noreferrer',
+      'aria-label': bookmark.name,
+    });
+
+    const remove = dom.el('button', {
+      type: 'button',
+      class: 'btn-del',
+      text: '✕',
+      title: `Remove ${bookmark.name}`,
+      'aria-label': `Remove ${bookmark.name}`,
+      on: {
+        click: async (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          bookmarks.splice(index, 1);
+          await persistBookmarks();
+          renderBookmarks();
+        },
+      },
+    });
+
+    const edit = dom.el('button', {
+      type: 'button',
+      class: 'btn-edit',
+      text: '✎',
+      title: `Edit ${bookmark.name}`,
+      'aria-label': `Edit ${bookmark.name}`,
+      on: {
+        click: (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          openModal(index);
+        },
+      },
+    });
+
+    return dom.append(tile, [
+      remove,
+      edit,
+      link,
+      dom.el('div', { class: 'sc-icon' }, [buildIcon(bookmark)]),
+      dom.el('span', { class: 'sc-label', text: bookmark.name }),
+    ]);
+  }
 
   function renderBookmarks() {
     const grid = $('shortcuts-grid');
-    grid.innerHTML = '';
+    if (!grid) return;
 
-    bookmarks.forEach((bm, index) => {
-      const item = document.createElement('div');
-      item.className = 'sc-item';
-      item.draggable = true;
-      item.dataset.index = index;
-      item.innerHTML = `
-        <div class="btn-del" data-del="${index}" title="Entfernen">✕</div>
-        <button class="btn-edit" data-edit="${index}" title="Bearbeiten" aria-label="Bearbeiten">✎</button>
-        <a class="full-link" href="${bm.url}" target="_blank" rel="noopener"></a>
-        <div class="sc-icon"><img src="${favicon(bm.url)}" onerror="this.style.display='none'"></div>
-        <span class="sc-label">${bm.name}</span>`;
+    const tiles = bookmarks.map(buildTile);
 
-      // Drag & drop reorder
-      item.addEventListener('dragstart', (e) => {
-        dragIndex = index;
-        item.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        try {
-          e.dataTransfer.setData('text/plain', String(index));
-        } catch {}
-      });
-      item.addEventListener('dragend', () => {
-        item.classList.remove('dragging');
-        document
-          .querySelectorAll('.sc-item')
-          .forEach((el) => el.classList.remove('drag-over'));
-      });
-      item.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        item.classList.add('drag-over');
-      });
-      item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
-      item.addEventListener('drop', (e) => {
-        e.preventDefault();
-        item.classList.remove('drag-over');
-        const to = index;
-        if (dragIndex === null || dragIndex === to) return;
-        const moved = bookmarks.splice(dragIndex, 1)[0];
-        bookmarks.splice(to, 0, moved);
-        dragIndex = null;
-        window.CUSTM_STORE.set({ bookmarks });
-        renderBookmarks();
-      });
+    if (bookmarks.length < store.maxBookmarks) {
+      tiles.push(
+        dom.el(
+          'button',
+          {
+            type: 'button',
+            class: 'sc-item sc-item-add',
+            'aria-label': 'Add bookmark',
+            on: { click: () => openModal(-1) },
+          },
+          [
+            dom.el('span', { class: 'sc-icon', text: '+' }),
+            dom.el('span', { class: 'sc-label', text: 'Add' }),
+          ]
+        )
+      );
+    }
 
-      // Edit button (stop the full-link from navigating)
-      item.querySelector('.btn-edit').addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        openModal(index);
-      });
-
-      grid.appendChild(item);
-    });
-
-    // add button
-    const add = document.createElement('div');
-    add.className = 'sc-item sc-item-add';
-    add.innerHTML = `
-      <div class="sc-icon">+</div>
-      <span class="sc-label">Hinzufügen</span>`;
-    add.addEventListener('click', () => openModal(-1));
-    grid.appendChild(add);
+    dom.replace(grid, tiles);
   }
 
-  /* ── Modal ────────────────────────────────────── */
-  let editIndex = -1;
+  /* ── Add / edit modal ──────────────────────────────────────────────── */
+  const URL_ERRORS = {
+    urlEmpty: 'Enter a URL.',
+    urlMalformed: 'That does not look like a valid URL.',
+    urlUnsafeProtocol: 'Only http:// and https:// addresses are allowed.',
+    urlNoHost: 'That URL is missing a hostname.',
+  };
+
+  function setModalError(message) {
+    const el = $('modal-error');
+    if (!el) return;
+    el.textContent = message || '';
+    el.hidden = !message;
+  }
+
   function openModal(index) {
     editIndex = index;
     const name = $('bookmark-name');
     const url = $('bookmark-url');
-    if (index >= 0) {
-      name.value = bookmarks[index].name;
-      url.value = bookmarks[index].url;
-      $('modal-title').textContent = 'Lesezeichen bearbeiten';
-      $('modal-save').textContent = 'Aktualisieren';
-    } else {
-      name.value = '';
-      url.value = '';
-      $('modal-title').textContent = 'Lesezeichen hinzufügen';
-      $('modal-save').textContent = 'Speichern';
-    }
+    const editing = index >= 0;
+
+    name.value = editing ? bookmarks[index].name : '';
+    url.value = editing ? bookmarks[index].url : '';
+    $('modal-title').textContent = editing ? 'Edit bookmark' : 'Add bookmark';
+    $('modal-save').textContent = editing ? 'Update' : 'Save';
+
+    setModalError('');
     $('modal-overlay').classList.add('active');
     name.focus();
   }
+
   function closeModal() {
     $('modal-overlay').classList.remove('active');
+    setModalError('');
   }
-  function saveModal() {
-    const name = $('bookmark-name').value.trim();
-    let url = $('bookmark-url').value.trim();
-    if (!name || !url) return;
-    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
-    if (editIndex >= 0) bookmarks[editIndex] = { name, url };
-    else bookmarks.push({ name, url });
-    window.CUSTM_STORE.set({ bookmarks });
+
+  async function saveModal() {
+    const rawName = $('bookmark-name').value.trim();
+    const check = urls.normalizeBookmarkUrl($('bookmark-url').value);
+
+    if (!check.ok) {
+      setModalError(URL_ERRORS[check.reason] || URL_ERRORS.urlMalformed);
+      $('bookmark-url').focus();
+      return;
+    }
+
+    const entry = { name: rawName || urls.displayHost(check.url), url: check.url };
+    if (editIndex >= 0) bookmarks[editIndex] = entry;
+    else bookmarks.push(entry);
+
+    await persistBookmarks();
     closeModal();
     renderBookmarks();
   }
 
-  /* ── Init dashboard ───────────────────────────── */
+  /* ── Dashboard wiring ──────────────────────────────────────────────── */
   function initDashboard() {
     renderEnginePicker();
-    const grid = $('shortcuts-grid');
-    grid.addEventListener('click', (e) => {
-      const del = e.target.closest('[data-del]');
-      if (del) {
-        e.preventDefault();
-        e.stopPropagation();
-        bookmarks.splice(Number(del.dataset.del), 1);
-        window.CUSTM_STORE.set({ bookmarks });
-        renderBookmarks();
-      }
-    });
+    applyEngineButton();
+    renderBookmarks();
 
-    // Allow dropping anywhere on the grid empties reorder gracefully
-    grid.addEventListener('dragover', (e) => e.preventDefault());
-
-    $('engine-current').addEventListener('click', (e) => {
-      e.stopPropagation();
-      $('engine-menu').hidden = !$('engine-menu').hidden;
+    const engineButton = $('engine-current');
+    engineButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const menu = $('engine-menu');
+      menu.hidden = !menu.hidden;
+      engineButton.setAttribute('aria-expanded', String(!menu.hidden));
     });
-    document.addEventListener('click', () => {
-      $('engine-menu').hidden = true;
-    });
+    document.addEventListener('click', closeEngineMenu);
 
-    $('search-form').addEventListener('submit', (e) => {
-      e.preventDefault();
+    $('search-form').addEventListener('submit', (event) => {
+      event.preventDefault();
       handleSearch($('search-input').value);
-    });
-    $('search-input').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        handleSearch($('search-input').value);
-      }
     });
 
     $('modal-cancel').addEventListener('click', closeModal);
     $('modal-save').addEventListener('click', saveModal);
-    $('modal-overlay').addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) closeModal();
+    $('modal-overlay').addEventListener('click', (event) => {
+      if (event.target === event.currentTarget) closeModal();
     });
-    $('bookmark-url').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') saveModal();
+    $('bookmark-url').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') saveModal();
     });
-
-    $('settings-link').addEventListener('click', (e) => {
-      e.preventDefault();
-      try {
-        chrome.runtime.openOptionsPage();
-      } catch {}
-    });
-    $('logo').addEventListener('click', () => {
-      try {
-        chrome.runtime.openOptionsPage();
-      } catch {}
+    $('bookmark-name').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') $('bookmark-url').focus();
     });
 
-    // Keyboard: type anywhere focuses search
-    document.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
-      if (e.key === '/') {
-        e.preventDefault();
+    $('settings-link').addEventListener('click', (event) => {
+      event.preventDefault();
+      window.CUSTM_ENV.openOptions();
+    });
+    $('logo').addEventListener('click', () => window.CUSTM_ENV.openOptions());
+
+    // Typing anywhere focuses search, so the tab behaves like an address bar.
+    document.addEventListener('keydown', (event) => {
+      const tag = event.target.tagName;
+      const modalOpen = $('modal-overlay').classList.contains('active');
+
+      if (event.key === 'Escape') {
+        closeEngineMenu();
+        if (modalOpen) closeModal();
+        else $('search-input').blur();
+        return;
+      }
+      if (modalOpen || tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+      if (event.key === '/') {
+        event.preventDefault();
         $('search-input').focus();
-      } else if (e.key === 'Escape') {
-        $('search-input').blur();
-        closeModal();
-      } else if (e.key.length === 1) {
+      } else if (event.key.length === 1) {
         $('search-input').focus();
       }
     });
   }
 
-  /* ── Redirect mode ────────────────────────────── */
+  /* ── Redirect mode ─────────────────────────────────────────────────── */
   function initRedirect(targetUrl, maskUrl) {
+    const target = urls.normalizeTargetUrl(targetUrl);
+    if (!target.ok) {
+      // A target that no longer validates must not strand the user on a blank
+      // page — fall through to the dashboard instead.
+      initDashboard();
+      return;
+    }
+
     $('dashboard').hidden = true;
+
+    if (!maskUrl) {
+      window.location.replace(target.url);
+      return;
+    }
+
     const wrap = $('redirect-frame-wrap');
     const frame = $('redirect-frame');
     wrap.hidden = false;
-    if (maskUrl) {
-      frame.src = targetUrl;
-    } else {
-      window.location.href = targetUrl;
-    }
+    frame.src = target.url;
+
+    // Many sites refuse to be framed (X-Frame-Options / frame-ancestors). The
+    // frame then sits blank with no error a parent page can read. Offer a way
+    // out rather than leaving a dead tab.
+    let loaded = false;
+    frame.addEventListener('load', () => {
+      loaded = true;
+    });
+
+    setTimeout(() => {
+      if (loaded) return;
+      wrap.appendChild(
+        dom.el('div', { class: 'frame-fallback', role: 'status' }, [
+          dom.el('p', {
+            class: 'frame-fallback__text',
+            text: 'This site refuses to be embedded.',
+          }),
+          dom.el('a', {
+            class: 'ct-btn-primary',
+            href: target.url,
+            text: 'Open it directly',
+          }),
+        ])
+      );
+    }, FRAME_FALLBACK_MS);
   }
 
-  /* ── Boot ─────────────────────────────────────── */
+  /* ── Boot ──────────────────────────────────────────────────────────── */
   (async () => {
+    updateClock();
+    updateGreeting();
+    setInterval(updateClock, CLOCK_INTERVAL_MS);
+    setInterval(updateGreeting, GREETING_INTERVAL_MS);
+
+    // Marks the tab as rendered, for the background persistence check.
     try {
-      chrome.storage.local.set({ lastSeen: Date.now() });
-    } catch {}
+      await api.storage.local.set({ lastSeen: Date.now() });
+    } catch {
+      /* Not worth failing the page over. */
+    }
 
     try {
-      await window.CUSTM_STORE.pullSyncIfEnabled();
-    } catch {}
+      await store.pullSyncIfEnabled();
+    } catch {
+      /* Local settings remain authoritative. */
+    }
 
-    const s = await window.CUSTM_STORE.getAll();
-    currentEngine = s.searchEngine || 'duckduckgo';
-    applyEngineButton();
-    bookmarks = s.bookmarks || [];
+    settings = await store.getAll();
+    applyTheme(settings.theme);
+    currentEngine = settings.searchEngine;
+    bookmarks = settings.bookmarks;
 
-    if (s.mode === 'redirect' && s.targetUrl) {
-      initRedirect(s.targetUrl, s.maskUrl);
+    if (settings.mode === 'redirect' && settings.targetUrl) {
+      initRedirect(settings.targetUrl, settings.maskUrl);
     } else {
       initDashboard();
-      renderBookmarks();
     }
+
+    document.body.classList.add('is-ready');
   })();
 })();

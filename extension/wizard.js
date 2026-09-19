@@ -8,6 +8,9 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
+  const dom = window.CUSTM_DOM;
+  const urls = window.CUSTM_URL;
+  const api = window.CUSTM_API;
   const STEP_COUNT = 4;
   let step = 0;
 
@@ -42,7 +45,7 @@
       el.hidden = Number(el.dataset.step) !== n;
     });
     $('wiz-back').hidden = n === 0;
-    $('wiz-next').textContent = n === STEP_COUNT - 1 ? 'Fertig 🎉' : 'Weiter';
+    $('wiz-next').textContent = n === STEP_COUNT - 1 ? 'Finish 🎉' : 'Next';
     renderProgress();
   }
 
@@ -59,27 +62,51 @@
 
   /* ── Bookmarks ────────────────────────────────── */
   function renderBookmarks() {
-    const box = $('wiz-bookmarks');
-    box.innerHTML = '';
-    state.bookmarks.forEach((bm, i) => {
-      const row = document.createElement('div');
-      row.className = 'wiz-bm-row';
-      row.innerHTML = `
-        <input class="ct-input bm-name" placeholder="Name" value="${bm.name}">
-        <input class="ct-input bm-url" placeholder="URL" value="${bm.url}">
-        <button class="wiz-bm-del" title="Entfernen">✕</button>`;
-      row.querySelector('.bm-name').addEventListener('input', (e) => {
-        state.bookmarks[i].name = e.target.value;
-      });
-      row.querySelector('.bm-url').addEventListener('input', (e) => {
-        state.bookmarks[i].url = e.target.value;
-      });
-      row.querySelector('.wiz-bm-del').addEventListener('click', () => {
-        state.bookmarks.splice(i, 1);
-        renderBookmarks();
-      });
-      box.appendChild(row);
-    });
+    // Built as elements rather than an HTML string: interpolating a bookmark
+    // name into value="..." lets a single quote character break out of the
+    // attribute and inject markup.
+    const rows = state.bookmarks.map((bm, i) =>
+      dom.el('div', { class: 'wiz-bm-row' }, [
+        dom.el('input', {
+          class: 'ct-input bm-name',
+          placeholder: 'Name',
+          value: bm.name,
+          'aria-label': 'Bookmark name',
+          on: {
+            input: (event) => {
+              state.bookmarks[i].name = event.target.value;
+            },
+          },
+        }),
+        dom.el('input', {
+          class: 'ct-input bm-url',
+          placeholder: 'URL',
+          value: bm.url,
+          spellcheck: 'false',
+          'aria-label': 'Bookmark URL',
+          on: {
+            input: (event) => {
+              state.bookmarks[i].url = event.target.value;
+            },
+          },
+        }),
+        dom.el('button', {
+          type: 'button',
+          class: 'wiz-bm-del',
+          text: '✕',
+          title: 'Remove',
+          'aria-label': 'Remove bookmark',
+          on: {
+            click: () => {
+              state.bookmarks.splice(i, 1);
+              renderBookmarks();
+            },
+          },
+        }),
+      ])
+    );
+
+    dom.replace($('wiz-bookmarks'), rows);
   }
   $('wiz-add-bm').addEventListener('click', () => {
     state.bookmarks.push({ name: '', url: '' });
@@ -88,23 +115,29 @@
 
   /* ── Engines ──────────────────────────────────── */
   function renderEngines() {
-    const box = $('wiz-engines');
-    box.innerHTML = '';
-    window.CUSTM_ENGINES.all.forEach((e) => {
-      const btn = document.createElement('button');
-      btn.className = 'wiz-engine' + (e.id === state.searchEngine ? ' active' : '');
-      const label =
-        e.privacy === 'high' ? 'privat' : e.privacy === 'medium' ? 'mittel' : 'tracking';
-      btn.innerHTML = `
-        <span>${e.icon}</span>
-        <span>${e.name}</span>
-        <span class="e-priv ${e.privacy}">${label}</span>`;
-      btn.addEventListener('click', () => {
-        state.searchEngine = e.id;
-        renderEngines();
-      });
-      box.appendChild(btn);
-    });
+    const buttons = window.CUSTM_ENGINES.all.map((engine) =>
+      dom.el(
+        'button',
+        {
+          type: 'button',
+          class: 'wiz-engine' + (engine.id === state.searchEngine ? ' active' : ''),
+          'aria-pressed': String(engine.id === state.searchEngine),
+          on: {
+            click: () => {
+              state.searchEngine = engine.id;
+              renderEngines();
+            },
+          },
+        },
+        [
+          dom.el('span', { text: engine.icon }),
+          dom.el('span', { text: engine.name }),
+          dom.el('span', { class: `e-priv ${engine.privacy}`, text: engine.privacy }),
+        ]
+      )
+    );
+
+    dom.replace($('wiz-engines'), buttons);
   }
 
   /* ── Theme ────────────────────────────────────── */
@@ -120,36 +153,35 @@
   /* ── Nav ──────────────────────────────────────── */
   $('wiz-next').addEventListener('click', async () => {
     if (step === STEP_COUNT - 1) {
-      // finish
+      const settings = {
+        mode: state.mode,
+        // Normalised here so a wizard-created profile is already clean;
+        // store.js re-checks on read, but an unusable value should be caught
+        // while the user is still looking at the field.
+        bookmarks: window.CUSTM_STORE.normalizeBookmarks(state.bookmarks),
+        searchEngine: state.searchEngine,
+        theme: state.theme,
+        onboardingDone: true,
+      };
+
       if (state.mode === 'redirect') {
-        let url = $('wiz-url').value.trim();
-        if (url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
-        if (state.mode === 'redirect' && !url) {
+        const target = urls.normalizeTargetUrl($('wiz-url').value);
+        if (!target.ok) {
           $('wiz-url').focus();
+          $('wiz-url').setAttribute('aria-invalid', 'true');
           return;
         }
-        await window.CUSTM_STORE.set({
-          mode: 'redirect',
-          targetUrl: url,
-          maskUrl: true,
-          bookmarks: state.bookmarks,
-          searchEngine: state.searchEngine,
-          theme: state.theme,
-          onboardingDone: true,
-        });
-      } else {
-        await window.CUSTM_STORE.set({
-          mode: 'dashboard',
-          bookmarks: state.bookmarks,
-          searchEngine: state.searchEngine,
-          theme: state.theme,
-          onboardingDone: true,
-        });
+        settings.targetUrl = target.url;
+        settings.maskUrl = true;
       }
-      // open the finished tab
+
+      await window.CUSTM_STORE.set(settings);
+
       try {
-        await chrome.tabs.create({ url: chrome.runtime.getURL('newtab.html') });
-      } catch {}
+        await api.tabs.create({ url: api.runtime.getURL('newtab.html') });
+      } catch {
+        /* The wizard still closes; the user's next new tab picks it up. */
+      }
       window.close();
       return;
     }

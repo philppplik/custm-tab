@@ -29,6 +29,9 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const EXT = join(ROOT, 'extension');
 const DIST = join(ROOT, 'dist');
 
+/** Chrome-only permissions that AMO rejects as unknown. */
+const FIREFOX_UNKNOWN_PERMISSIONS = new Set(['favicon']);
+
 /** Never ship these into a store package. */
 const EXCLUDED_NAMES = new Set(['.DS_Store', 'Thumbs.db']);
 const EXCLUDED_SUFFIXES = ['.local.js', '.map'];
@@ -62,6 +65,12 @@ function manifestFor(target, manifest) {
     // Firefox runs an event page, not a worker; `type: module` here would be
     // interpreted against the wrong environment.
     delete m.background.type;
+    // `favicon` is a Chrome-only permission backing the `_favicon/` cache.
+    // Leaving it in makes AMO reject the upload as an unknown permission;
+    // favicon.js already falls back to locally drawn monogram tiles there.
+    m.permissions = (m.permissions ?? []).filter(
+      (p) => !FIREFOX_UNKNOWN_PERMISSIONS.has(p)
+    );
   }
   return m;
 }
