@@ -7,27 +7,67 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-### Security
+## [1.2.0] - 2026-09-19
 
-- **Stored XSS in the bookmark tiles and the onboarding wizard.** Bookmark
-  names and URLs were interpolated into HTML strings and assigned with
-  `innerHTML`, so a bookmark named `<img src=x onerror=...>` executed on the
-  new-tab page — a privileged extension origin holding every setting the user
-  has, and reachable through an imported settings file. All rendering now goes
-  through `extension/dom.js`, which assigns text via `textContent` and refuses
-  inline event attributes. `web-ext lint` reported four `UNSAFE_VAR_ASSIGNMENT`
-  findings before; it now reports zero, and `--warnings-as-errors` is enforced.
-- **`javascript:` and `data:` URLs were accepted as bookmarks and as the
-  redirect target.** The only check was that `new URL()` did not throw, and
-  both parse cleanly. `extension/url.js` now validates every URL against a
-  frozen protocol allowlist and scrubs input the way the WHATWG URL parser
-  does, so a tab character inside `java<TAB>script:` cannot walk past a prefix
-  check either.
-- **Removed the Google favicon beacon.** Every bookmark tile requested its icon
-  from `google.com/s2/favicons`, handing Google the list of pinned sites and a
-  signal on every new tab — from an extension whose README promises no
-  tracking. Icons now resolve on-device by default, with letter tiles as the
-  universal fallback and a clearly labelled opt-in for a third-party lookup.
+### Added
+
+- **Backgrounds you control.** Three kinds, switchable in Settings:
+  - **Gradient** — the signature ambient blobs, now in six palettes (Aurora,
+    Dusk, Tide, Ember, Slate, Bloom).
+  - **Solid colour** — ten curated swatches plus a full colour picker. The
+    interface derives its text colour from the background's WCAG relative
+    luminance, so a pale colour stays readable instead of being forbidden.
+  - **Photo** — a Pexels image, with a scrim and blur the user controls.
+- **Pexels photo backgrounds** (`extension/pexels.js`). The user supplies their
+  own API key: anything bundled into an extension is public, so a shipped key
+  would be scraped, shared across every install against one 200-per-hour
+  budget, and revoked. The key is stored in `storage.local`, never synced,
+  redacted from exports, and sent only in the `Authorization` header of a
+  request that refuses to follow redirects. Host access to `api.pexels.com` is
+  requested at the moment the feature is switched on and dropped again when it
+  is switched off. One request caches a page of 24 photos which is then rotated
+  locally, so even "new photo every tab" touches the network about four times a
+  day. A failed refresh keeps showing the cached photo rather than blanking the
+  tab. Every photo carries the photographer credit Pexels asks for. See
+  [docs/PEXELS.md](docs/PEXELS.md).
+- **Sunrise reveal.** The background rises and blooms when a tab opens — only
+  `transform` and `opacity`, so it runs on the compositor and never delays
+  first paint. Suppressed automatically under `prefers-reduced-motion`, which
+  the user setting cannot override.
+
+- Repository tooling: ESLint (flat config), Prettier, Vitest with an in-memory
+  `chrome.*` mock, and an `.editorconfig`.
+- `scripts/validate-manifest.mjs` — fails CI when a manifest key points at a
+  missing file, an HTML page references a renamed asset, a permission appears
+  outside the reviewed allowlist, `host_permissions` is used instead of
+  `optional_host_permissions`, the background key would not load in both
+  browsers, or locale catalogues drift out of sync.
+- `scripts/build.mjs` — emits per-browser packages into `dist/`, because Chrome
+  and Firefox reject each other's MV3 background key. Uses a dependency-free,
+  reproducible ZIP writer so packaging works identically on Windows and CI.
+- GitHub Actions: `CI` (format, lint, manifest validation, tests with coverage
+  on Node 20 and 22, archive integrity check, `web-ext lint`, dependency
+  review), `CodeQL` with the `security-extended` query pack, and a tag-driven
+  `Release` workflow that asserts the tag matches `manifest.json`.
+- Dependabot for npm dev tooling and GitHub Actions, grouped weekly.
+- `SECURITY.md`, `CONTRIBUTING.md`, `CODEOWNERS`, issue forms, and a pull
+  request template.
+
+### Changed
+
+- `optional_host_permissions` narrowed from `<all_urls>` to
+  `https://api.pexels.com/*`. Nothing in the extension ever needed blanket host
+  access, and store reviewers reasonably ask about it.
+- `theme: auto` now defers to what the background needs, which is what keeps a
+  user-picked pale colour legible. An explicit light/dark choice still wins.
+
+- Storage is treated as untrusted: bookmarks are normalised and revalidated on
+  every read, capped at 60 entries, and names clamped to 64 characters, so a
+  corrupted profile or a hostile settings import cannot inject an unsafe URL.
+- The UI is English throughout; clock and date follow the browser locale
+  instead of a hard-coded `de-DE`.
+- Keyboard focus is visible on every interactive surface, the add tile and
+  engine items are real buttons, and `prefers-reduced-motion` is respected.
 
 ### Fixed
 
@@ -49,38 +89,6 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   AMO rejects as unknown, and the manifest now declares
   `data_collection_permissions: { required: ["none"] }`, which AMO requires.
 
-### Changed
-
-- Storage is treated as untrusted: bookmarks are normalised and revalidated on
-  every read, capped at 60 entries, and names clamped to 64 characters, so a
-  corrupted profile or a hostile settings import cannot inject an unsafe URL.
-- The UI is English throughout; clock and date follow the browser locale
-  instead of a hard-coded `de-DE`.
-- Keyboard focus is visible on every interactive surface, the add tile and
-  engine items are real buttons, and `prefers-reduced-motion` is respected.
-
-### Added
-
-- Repository tooling: ESLint (flat config), Prettier, Vitest with an in-memory
-  `chrome.*` mock, and an `.editorconfig`.
-- `scripts/validate-manifest.mjs` — fails CI when a manifest key points at a
-  missing file, an HTML page references a renamed asset, a permission appears
-  outside the reviewed allowlist, `host_permissions` is used instead of
-  `optional_host_permissions`, the background key would not load in both
-  browsers, or locale catalogues drift out of sync.
-- `scripts/build.mjs` — emits per-browser packages into `dist/`, because Chrome
-  and Firefox reject each other's MV3 background key. Uses a dependency-free,
-  reproducible ZIP writer so packaging works identically on Windows and CI.
-- GitHub Actions: `CI` (format, lint, manifest validation, tests with coverage
-  on Node 20 and 22, archive integrity check, `web-ext lint`, dependency
-  review), `CodeQL` with the `security-extended` query pack, and a tag-driven
-  `Release` workflow that asserts the tag matches `manifest.json`.
-- Dependabot for npm dev tooling and GitHub Actions, grouped weekly.
-- `SECURITY.md`, `CONTRIBUTING.md`, `CODEOWNERS`, issue forms, and a pull
-  request template.
-
-### Fixed
-
 - **Firefox never ran the background logic.** The manifest declared only
   `background.service_worker`, which Firefox MV3 does not support. Added
   `background.scripts` so the event page has an entry point, and guarded the
@@ -93,6 +101,28 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **The Chrome Web Store would have rejected the upload.** `description` was
   133 characters against a 132-character hard limit. Shortened, and now
   enforced by `validate-manifest` and a unit test.
+
+### Security
+
+- **Stored XSS in the bookmark tiles and the onboarding wizard.** Bookmark
+  names and URLs were interpolated into HTML strings and assigned with
+  `innerHTML`, so a bookmark named `<img src=x onerror=...>` executed on the
+  new-tab page — a privileged extension origin holding every setting the user
+  has, and reachable through an imported settings file. All rendering now goes
+  through `extension/dom.js`, which assigns text via `textContent` and refuses
+  inline event attributes. `web-ext lint` reported four `UNSAFE_VAR_ASSIGNMENT`
+  findings before; it now reports zero, and `--warnings-as-errors` is enforced.
+- **`javascript:` and `data:` URLs were accepted as bookmarks and as the
+  redirect target.** The only check was that `new URL()` did not throw, and
+  both parse cleanly. `extension/url.js` now validates every URL against a
+  frozen protocol allowlist and scrubs input the way the WHATWG URL parser
+  does, so a tab character inside `java<TAB>script:` cannot walk past a prefix
+  check either.
+- **Removed the Google favicon beacon.** Every bookmark tile requested its icon
+  from `google.com/s2/favicons`, handing Google the list of pinned sites and a
+  signal on every new tab — from an extension whose README promises no
+  tracking. Icons now resolve on-device by default, with letter tiles as the
+  universal fallback and a clearly labelled opt-in for a third-party lookup.
 
 ### Removed
 
@@ -129,6 +159,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Hourly persistence monitor that warns when the new-tab override appears to
   have been disabled.
 
-[Unreleased]: https://github.com/philppplik/custm-tab/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/philppplik/custm-tab/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/philppplik/custm-tab/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/philppplik/custm-tab/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/philppplik/custm-tab/releases/tag/v1.0.0

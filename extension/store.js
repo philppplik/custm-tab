@@ -45,6 +45,34 @@
     // ── Appearance ──
     theme: 'auto', // 'auto' | 'light' | 'dark'
 
+    // Background: gradient palette, flat colour, or a Pexels photo.
+    // See backgrounds.js for the shape and the contrast rules.
+    background: {
+      type: 'gradient', // 'gradient' | 'color' | 'photo'
+      gradient: 'aurora',
+      color: '#180646',
+      overlay: 0.35, // scrim over a photo, 0-0.8
+      blur: 0, // photo blur in px, 0-24
+    },
+
+    // Sunrise reveal on page load. Decorative, and suppressed automatically
+    // under prefers-reduced-motion.
+    sunrise: true,
+
+    // ── Pexels photo backgrounds ──
+    pexels: {
+      query: '', // empty means the curated feed
+      orientation: 'landscape',
+      refresh: 'daily', // 'tab' | 'hourly' | 'daily'
+    },
+
+    // The user's own API key. NEVER syncable: storage.sync leaves the device,
+    // and this is a credential. Redacted from settings exports.
+    pexelsApiKey: '',
+
+    // A cached page of photos, rotated locally so one request serves a day.
+    pexelsCache: null,
+
     // ── Sync ──
     syncEnabled: false,
 
@@ -68,8 +96,19 @@
     'iconMode',
     'maskUrl',
     'theme',
+    'background',
+    'sunrise',
+    'pexels',
     'syncEnabled',
   ]);
+
+  /**
+   * Keys that must never leave this device, even though they are settings.
+   *
+   * `pexelsApiKey` is a credential. `pexelsCache` is a large, device-local
+   * blob that would burn the 100KB storage.sync quota for no benefit.
+   */
+  const NEVER_SYNC_KEYS = Object.freeze(['pexelsApiKey', 'pexelsCache']);
 
   const KEYS = Object.freeze(Object.keys(DEFAULTS));
 
@@ -126,9 +165,39 @@
     );
     settings.bookmarks = normalizeBookmarks(settings.bookmarks);
     settings.maskUrl = settings.maskUrl !== false;
+    settings.sunrise = settings.sunrise !== false;
     settings.syncEnabled = settings.syncEnabled === true;
     settings.targetUrl = typeof settings.targetUrl === 'string' ? settings.targetUrl : '';
+
+    settings.background = global.CUSTM_BACKGROUND
+      ? global.CUSTM_BACKGROUND.normalize(settings.background)
+      : settings.background;
+
+    const pexels =
+      settings.pexels && typeof settings.pexels === 'object' ? settings.pexels : {};
+    settings.pexels = {
+      query: String(pexels.query == null ? '' : pexels.query).slice(0, 80),
+      orientation: oneOf(
+        pexels.orientation,
+        ['landscape', 'portrait', 'square'],
+        'landscape'
+      ),
+      refresh: oneOf(pexels.refresh, ['tab', 'hourly', 'daily'], 'daily'),
+    };
+    settings.pexelsApiKey =
+      typeof settings.pexelsApiKey === 'string' ? settings.pexelsApiKey.trim() : '';
+
     return settings;
+  }
+
+  /**
+   * A copy of the settings safe to write to a file or paste into an issue.
+   * The API key is a credential and the photo cache is device-local noise.
+   */
+  function toExport(settings) {
+    const copy = structuredClone(settings);
+    for (const key of NEVER_SYNC_KEYS) delete copy[key];
+    return copy;
   }
 
   /** Merge stored values onto defaults, then normalise. */
@@ -161,7 +230,9 @@
 
     const syncable = {};
     for (const key of SYNC_KEYS) {
-      if (key in patch) syncable[key] = patch[key];
+      // Belt and braces: SYNC_KEYS should never contain a credential, but a
+      // future edit adding one there must not silently upload it.
+      if (key in patch && !NEVER_SYNC_KEYS.includes(key)) syncable[key] = patch[key];
     }
     if (!Object.keys(syncable).length) return;
 
@@ -203,10 +274,12 @@
     defaults: Object.freeze(DEFAULTS),
     keys: KEYS,
     syncKeys: SYNC_KEYS,
+    neverSyncKeys: NEVER_SYNC_KEYS,
     maxBookmarks: MAX_BOOKMARKS,
     getDefaults,
     normalize,
     normalizeBookmarks,
+    toExport,
     getAll,
     set,
     pullSyncIfEnabled,

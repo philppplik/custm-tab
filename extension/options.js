@@ -181,6 +181,205 @@
     }, 2000);
   }
 
+  /* ── Background ───────────────────────────────── */
+  const backgrounds = window.CUSTM_BACKGROUND;
+  const pexels = window.CUSTM_PEXELS;
+  const dom = window.CUSTM_DOM;
+
+  let bg = backgrounds.defaults;
+
+  const PEXELS_MESSAGES = {
+    pexelsNoKey: 'That does not look like a Pexels key.',
+    pexelsBadKey: 'Pexels rejected this key.',
+    pexelsRateLimited: 'Rate limit reached. Try again later.',
+    pexelsNetwork: 'Could not reach Pexels. Check your connection.',
+    pexelsNoResults: 'No photos matched that search.',
+    pexelsFailed: 'Pexels returned an unexpected response.',
+    pexelsDenied: 'Permission to reach api.pexels.com was declined.',
+  };
+
+  function showBgPanels() {
+    $('bg-gradient-settings').hidden = bg.type !== 'gradient';
+    $('bg-color-settings').hidden = bg.type !== 'color';
+    $('bg-photo-settings').hidden = bg.type !== 'photo';
+    document.querySelectorAll('[data-bg-type]').forEach((btn) => {
+      const active = btn.dataset.bgType === bg.type;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-checked', String(active));
+    });
+  }
+
+  function renderGradients() {
+    const row = $('gradient-palette');
+    if (!row) return;
+    dom.replace(
+      row,
+      Object.entries(backgrounds.gradients).map(([id, palette]) =>
+        dom.el('button', {
+          type: 'button',
+          class: 'palette-chip' + (id === bg.gradient ? ' active' : ''),
+          role: 'radio',
+          'aria-checked': String(id === bg.gradient),
+          title: palette.name,
+          'aria-label': palette.name,
+          style: {
+            '--p0': palette.base,
+            '--p1': palette.blobs[0],
+            '--p2': palette.blobs[1],
+            '--p3': palette.blobs[2],
+          },
+          on: {
+            click: () => {
+              bg = { ...bg, gradient: id };
+              renderGradients();
+            },
+          },
+        })
+      )
+    );
+  }
+
+  function describeContrast() {
+    const note = $('bg-contrast-note');
+    if (!note) return;
+    const theme = backgrounds.themeForColor(bg.color);
+    note.textContent =
+      theme === 'light'
+        ? 'Light background — the interface switches to dark text.'
+        : 'Dark background — the interface uses light text.';
+  }
+
+  function renderSwatches() {
+    const row = $('color-swatches');
+    if (!row) return;
+    dom.replace(
+      row,
+      backgrounds.swatches.map((hex) =>
+        dom.el('button', {
+          type: 'button',
+          class: 'palette-chip palette-chip--solid' + (hex === bg.color ? ' active' : ''),
+          role: 'radio',
+          'aria-checked': String(hex === bg.color),
+          title: hex,
+          'aria-label': 'Background colour ' + hex,
+          style: { '--p0': hex },
+          on: {
+            click: () => {
+              bg = { ...bg, color: hex };
+              $('bg-color-input').value = hex;
+              $('bg-color-hex').value = hex;
+              renderSwatches();
+              describeContrast();
+            },
+          },
+        })
+      )
+    );
+  }
+
+  function syncRangeLabels() {
+    $('bg-overlay-value').textContent = Math.round(bg.overlay * 100) + '%';
+    $('bg-blur-value').textContent = bg.blur + 'px';
+  }
+
+  function initBackgroundControls(settings) {
+    bg = backgrounds.normalize(settings.background);
+
+    document.querySelectorAll('[data-bg-type]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const type = btn.dataset.bgType;
+        // Host access is requested at the moment the feature is switched on,
+        // from inside the click — browsers reject a prompt without a gesture.
+        if (type === 'photo' && !(await pexels.hasPermission())) {
+          const granted = await pexels.requestPermission();
+          if (!granted) {
+            setPexelsStatus(PEXELS_MESSAGES.pexelsDenied, false);
+            return;
+          }
+        }
+        if (type !== 'photo') await pexels.dropPermission();
+        bg = { ...bg, type };
+        showBgPanels();
+      });
+    });
+
+    $('bg-color-input').value = bg.color;
+    $('bg-color-hex').value = bg.color;
+    $('bg-color-input').addEventListener('input', (e) => {
+      bg = { ...bg, color: e.target.value };
+      $('bg-color-hex').value = e.target.value;
+      renderSwatches();
+      describeContrast();
+    });
+    $('bg-color-hex').addEventListener('input', (e) => {
+      if (!backgrounds.parseHex(e.target.value)) return;
+      bg = { ...bg, color: e.target.value };
+      $('bg-color-input').value = e.target.value;
+      renderSwatches();
+      describeContrast();
+    });
+
+    $('bg-overlay').value = String(Math.round(bg.overlay * 100));
+    $('bg-blur').value = String(bg.blur);
+    $('bg-overlay').addEventListener('input', (e) => {
+      bg = { ...bg, overlay: Number(e.target.value) / 100 };
+      syncRangeLabels();
+    });
+    $('bg-blur').addEventListener('input', (e) => {
+      bg = { ...bg, blur: Number(e.target.value) };
+      syncRangeLabels();
+    });
+
+    $('pexels-key').value = settings.pexelsApiKey;
+    $('pexels-query').value = settings.pexels.query;
+    $('pexels-orientation').value = settings.pexels.orientation;
+    $('pexels-refresh').value = settings.pexels.refresh;
+    $('toggle-sunrise').checked = settings.sunrise !== false;
+
+    $('pexels-test').addEventListener('click', testPexelsKey);
+
+    showBgPanels();
+    renderGradients();
+    renderSwatches();
+    describeContrast();
+    syncRangeLabels();
+  }
+
+  function setPexelsStatus(message, ok) {
+    const el = $('pexels-status');
+    el.textContent = message;
+    el.classList.add('save-feedback--visible');
+    el.classList.toggle('save-feedback--error', ok === false);
+  }
+
+  async function testPexelsKey() {
+    const key = $('pexels-key').value.trim();
+    if (!pexels.looksLikeKey(key)) {
+      setPexelsStatus(PEXELS_MESSAGES.pexelsNoKey, false);
+      return;
+    }
+    if (!(await pexels.hasPermission()) && !(await pexels.requestPermission())) {
+      setPexelsStatus(PEXELS_MESSAGES.pexelsDenied, false);
+      return;
+    }
+
+    setPexelsStatus('Checking…', true);
+    const result = await pexels.verifyKey(key);
+    if (!result.ok) {
+      setPexelsStatus(
+        PEXELS_MESSAGES[result.reason] || PEXELS_MESSAGES.pexelsFailed,
+        false
+      );
+      return;
+    }
+    setPexelsStatus(
+      result.remaining === null
+        ? 'Key works ✓'
+        : 'Key works ✓ — ' + result.remaining + ' requests left this month',
+      true
+    );
+  }
+
   /* ── Load ─────────────────────────────────────── */
   const settings = await store.getAll();
   applyMode(settings.mode || 'dashboard');
@@ -193,6 +392,8 @@
   updateStatusBadge(isActive);
   if (settings.targetUrl) await validateUrl(settings.targetUrl);
   syncToggle.checked = settings.syncEnabled === true;
+
+  initBackgroundControls(settings);
 
   if (iconModeSelect) {
     iconModeSelect.value = settings.iconMode;
@@ -223,6 +424,14 @@
       searchEngine: engineSelect.value,
       theme: currentTheme,
       iconMode: iconModeSelect ? iconModeSelect.value : 'local',
+      background: bg,
+      sunrise: $('toggle-sunrise').checked,
+      pexels: {
+        query: $('pexels-query').value.trim(),
+        orientation: $('pexels-orientation').value,
+        refresh: $('pexels-refresh').value,
+      },
+      pexelsApiKey: $('pexels-key').value.trim(),
       syncEnabled: syncToggle.checked,
     };
     if (currentMode === 'redirect') {

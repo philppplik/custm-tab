@@ -2,14 +2,21 @@
   "manifest_version": 3,
   "name": "cust*m Tab",
   "short_name": "cust*m Tab",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Your tab. Your rules. A custom new-tab dashboard — bookmarks, privacy-first search, clock. Or load your own URL instead.",
   "minimum_chrome_version": "121",
   "permissions": ["storage", "alarms", "notifications", "favicon"],
-  "optional_host_permissions": ["<all_urls>"],
-  "omnibox": { "keyword": "ct" },
-  "chrome_url_overrides": { "newtab": "newtab.html" },
-  "options_ui": { "page": "options.html", "open_in_tab": true },
+  "optional_host_permissions": ["https://api.pexels.com/*"],
+  "omnibox": {
+    "keyword": "ct"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "background": {
     "service_worker": "background.js",
     "scripts": ["search-engines.js", "background.js"]

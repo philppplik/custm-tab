@@ -17,6 +17,8 @@
   const store = window.CUSTM_STORE;
   const engines = window.CUSTM_ENGINES;
   const favicons = window.CUSTM_FAVICON;
+  const backgrounds = window.CUSTM_BACKGROUND;
+  const pexels = window.CUSTM_PEXELS;
 
   const $ = (id) => document.getElementById(id);
 
@@ -431,6 +433,76 @@
     });
   }
 
+  /* ── Background ────────────────────────────────────────────────────── */
+
+  /**
+   * Render the photographer credit Pexels asks for.
+   *
+   * Not optional politeness: crediting is a condition of the API terms, and
+   * someone made the picture.
+   */
+  function renderPhotoCredit(photo) {
+    if (!photo) return;
+    document.body.appendChild(
+      dom.el('div', { class: 'photo-credit' }, [
+        'Photo by ',
+        dom.el('a', {
+          href: photo.photographerUrl,
+          text: photo.photographer,
+          target: '_blank',
+          rel: 'noopener noreferrer',
+        }),
+        ' on ',
+        dom.el('a', {
+          href: photo.url || 'https://www.pexels.com',
+          text: 'Pexels',
+          target: '_blank',
+          rel: 'noopener noreferrer',
+        }),
+      ])
+    );
+  }
+
+  /**
+   * Resolve and apply the background.
+   *
+   * Returns the theme the background implies: a flat colour the user picked
+   * decides its own contrast, and a photo always wants light text.
+   */
+  async function applyBackground() {
+    const config = settings.background;
+
+    if (config.type !== 'photo') {
+      return backgrounds.apply(document, config, null);
+    }
+
+    // No key means the photo mode cannot work; fall back to the gradient
+    // rather than rendering an empty tab.
+    if (!pexels.looksLikeKey(settings.pexelsApiKey)) {
+      return backgrounds.apply(document, { ...config, type: 'gradient' }, null);
+    }
+
+    const result = await pexels.resolve({
+      key: settings.pexelsApiKey,
+      query: settings.pexels.query,
+      orientation: settings.pexels.orientation,
+      refresh: settings.pexels.refresh,
+      cache: settings.pexelsCache,
+    });
+
+    if (!result.ok) {
+      return backgrounds.apply(document, { ...config, type: 'gradient' }, null);
+    }
+
+    // Persist the rotated index (and any newly fetched page) so the next tab
+    // continues the rotation instead of repeating this photo.
+    store.set({ pexelsCache: result.cache }).catch(() => {});
+
+    const theme = backgrounds.apply(document, config, result.photo);
+    renderPhotoCredit(result.photo);
+    return theme;
+  }
+
   /* ── Redirect mode ─────────────────────────────────────────────────── */
   function initRedirect(targetUrl, maskUrl) {
     const target = urls.normalizeTargetUrl(targetUrl);
@@ -500,16 +572,29 @@
     }
 
     settings = await store.getAll();
-    applyTheme(settings.theme);
     currentEngine = settings.searchEngine;
     bookmarks = settings.bookmarks;
 
+    // Redirect mode never shows the dashboard, so skip the background work
+    // entirely rather than fetching a photo nobody will see.
     if (settings.mode === 'redirect' && settings.targetUrl) {
+      applyTheme(settings.theme);
       initRedirect(settings.targetUrl, settings.maskUrl);
-    } else {
-      initDashboard();
+      document.body.classList.add('is-ready');
+      return;
     }
 
+    // Start the reveal before the background resolves: the animation is on the
+    // blobs, which are already in the document, so it begins at first paint
+    // instead of waiting on a network round trip.
+    backgrounds.playSunrise(document, settings.sunrise);
+
+    const backgroundTheme = await applyBackground();
+    // An explicit theme choice wins; `auto` defers to what the background
+    // needs, which is the only way a user-picked pale colour stays readable.
+    applyTheme(settings.theme === 'auto' ? backgroundTheme : settings.theme);
+
+    initDashboard();
     document.body.classList.add('is-ready');
   })();
 })();
