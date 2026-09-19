@@ -32,9 +32,7 @@
     prog.appendChild(s);
   }
   function renderProgress() {
-    [...prog.children].forEach((c, i) =>
-      c.classList.toggle('active', i <= step)
-    );
+    [...prog.children].forEach((c, i) => c.classList.toggle('active', i <= step));
   }
 
   /* ── Step visibility ──────────────────────────── */
@@ -162,8 +160,9 @@
 
   /* ── Init ─────────────────────────────────────── */
   const existing = await window.CUSTM_STORE.getAll();
-  if (existing.bookmarks && existing.bookmarks.length)
+  if (existing.bookmarks && existing.bookmarks.length) {
     state.bookmarks = existing.bookmarks;
+  }
   if (existing.searchEngine) state.searchEngine = existing.searchEngine;
   if (existing.theme) state.theme = existing.theme;
   document.querySelectorAll('[data-wiz-theme]').forEach((b) => {

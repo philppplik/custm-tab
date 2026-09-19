@@ -17,18 +17,20 @@
     const now = new Date();
     const clockEl = $('clock');
     const dateEl = $('date-line');
-    if (clockEl)
+    if (clockEl) {
       clockEl.textContent = now.toLocaleTimeString('de-DE', {
         hour: '2-digit',
         minute: '2-digit',
       });
-    if (dateEl)
+    }
+    if (dateEl) {
       dateEl.textContent = now.toLocaleDateString('de-DE', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
         year: 'numeric',
       });
+    }
   }
   function updateGreeting() {
     const h = new Date().getHours();
@@ -67,8 +69,8 @@
         <span>${e.icon}</span>
         <span class="e-name">${e.name}</span>
         <span class="e-privacy ${e.privacy}">${
-        e.privacy === 'high' ? 'privat' : e.privacy === 'medium' ? 'mittel' : 'tracking'
-      }</span>`;
+          e.privacy === 'high' ? 'privat' : e.privacy === 'medium' ? 'mittel' : 'tracking'
+        }</span>`;
       item.addEventListener('click', () => {
         currentEngine = e.id;
         window.CUSTM_STORE.set({ searchEngine: e.id });
@@ -88,9 +90,7 @@
     const q = (raw || '').trim();
     if (!q) return;
     const isUrl =
-      /^(https?:\/\/)/i.test(q) ||
-      /^(www\.)/i.test(q) ||
-      /\S+\.\S{2,}/.test(q);
+      /^(https?:\/\/)/i.test(q) || /^(www\.)/i.test(q) || /\S+\.\S{2,}/.test(q);
     if (isUrl) {
       window.location.href = /^https?:\/\//i.test(q) ? q : 'https://' + q;
     } else {

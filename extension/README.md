@@ -6,10 +6,10 @@ cust*m Tab replaces your new tab with either a **privacy-first dashboard** (book
 
 ## Two modes
 
-| Mode | What it does |
-|------|--------------|
-| **Dashboard** (default) | Gradient startpage with live clock, greeting, search bar + engine picker, and editable bookmark tiles. |
-| **Redirect** | Loads any `https://`, `http://`, `file://`, or `chrome-extension://` URL as your new tab. Optionally embedded in an iframe to keep the extension URL in the address bar. |
+| Mode                    | What it does                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Dashboard** (default) | Gradient startpage with live clock, greeting, search bar + engine picker, and editable bookmark tiles.                                                                   |
+| **Redirect**            | Loads any `https://`, `http://`, `file://`, or `chrome-extension://` URL as your new tab. Optionally embedded in an iframe to keep the extension URL in the address bar. |
 
 Switch modes anytime in Settings.
 

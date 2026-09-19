@@ -31,8 +31,9 @@
   function applyTheme(theme) {
     currentTheme = theme;
     if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-    else if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    else document.documentElement.removeAttribute('data-theme');
+    else if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else document.documentElement.removeAttribute('data-theme');
     themeToggle.textContent = theme === 'dark' ? '☾' : theme === 'light' ? '☀' : '◐';
     themeChips.forEach((c) => c.classList.toggle('active', c.dataset.theme === theme));
   }
@@ -50,9 +51,7 @@
     modeBtns.forEach((b) => b.classList.toggle('active', b.dataset.mode === mode));
     redirectSettings.hidden = mode !== 'redirect';
   }
-  modeBtns.forEach((b) =>
-    b.addEventListener('click', () => applyMode(b.dataset.mode))
-  );
+  modeBtns.forEach((b) => b.addEventListener('click', () => applyMode(b.dataset.mode)));
 
   /* ── Engine select ────────────────────────────── */
   function buildEngineSelect(selectedId) {
@@ -61,7 +60,11 @@
       const opt = document.createElement('option');
       opt.value = e.id;
       const tag =
-        e.privacy === 'high' ? ' (privat)' : e.privacy === 'medium' ? ' (mittel)' : ' (tracking)';
+        e.privacy === 'high'
+          ? ' (privat)'
+          : e.privacy === 'medium'
+            ? ' (mittel)'
+            : ' (tracking)';
       opt.textContent = `${e.icon} ${e.name}${tag}`;
       if (e.id === selectedId) opt.selected = true;
       engineSelect.appendChild(opt);
@@ -70,8 +73,16 @@
 
   /* ── URL validation ───────────────────────────── */
   function setInputState(state, hint, icon) {
-    urlInput.classList.remove('url-input--valid', 'url-input--invalid', 'url-input--warning');
-    urlHint.classList.remove('field__hint--success', 'field__hint--error', 'field__hint--warning');
+    urlInput.classList.remove(
+      'url-input--valid',
+      'url-input--invalid',
+      'url-input--warning'
+    );
+    urlHint.classList.remove(
+      'field__hint--success',
+      'field__hint--error',
+      'field__hint--warning'
+    );
     if (state === 'valid') {
       urlInput.classList.add('url-input--valid');
       urlHint.classList.add('field__hint--success');
@@ -158,8 +169,7 @@
   urlInput.value = settings.targetUrl || '';
   maskUrlToggle.checked = settings.maskUrl !== false;
 
-  const isActive =
-    settings.mode === 'redirect' ? !!settings.targetUrl : true;
+  const isActive = settings.mode === 'redirect' ? !!settings.targetUrl : true;
   updateStatusBadge(isActive);
   if (settings.targetUrl) await validateUrl(settings.targetUrl);
   syncToggle.checked = settings.syncEnabled === true;

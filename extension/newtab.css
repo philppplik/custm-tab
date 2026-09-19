@@ -116,7 +116,7 @@ body {
   border-top-color: rgba(255, 255, 255, 0.8);
   transform: translateY(-2px);
 }
-:root[data-theme="light"] .search-shell {
+:root[data-theme='light'] .search-shell {
   border-top-color: rgba(27, 19, 43, 0.4);
   border-bottom-color: rgba(27, 19, 43, 0.15);
 }
@@ -240,11 +240,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.6) 0%,
-    rgba(30, 30, 45, 0.6) 100%
-  );
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(30, 30, 45, 0.6) 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: var(--ct-shadow-md);
   overflow: hidden;
