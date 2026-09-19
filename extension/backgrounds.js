@@ -1,11 +1,16 @@
 /**
  * cust*m Tab — Background engine
  *
- * Three kinds of background, one code path:
+ * Four kinds of background, one code path:
  *
  *   gradient  the signature ambient blobs, in a choice of palettes
  *   color     a single flat colour the user picks
  *   photo     a Pexels image, with a scrim and optional blur
+ *   image     the user's own picture, from their disk, stored on the device
+ *
+ * `photo` and `image` share everything downstream of "where did the pixels
+ * come from": the same layer, the same scrim, the same blur. Only the source
+ * differs, so only the source is modelled separately.
  *
  * CONTRAST IS COMPUTED, NOT GUESSED
  * ---------------------------------
@@ -19,7 +24,24 @@
 (function (global) {
   'use strict';
 
-  const TYPES = Object.freeze(['gradient', 'color', 'photo']);
+  const TYPES = Object.freeze(['gradient', 'color', 'photo', 'image']);
+
+  /**
+   * What a stored custom background is allowed to look like.
+   *
+   * The value ends up inside `url("…")` in a stylesheet on a privileged
+   * extension origin, so it is matched against an allowlist rather than
+   * checked for anything dangerous: only these three raster types, only
+   * base64, nothing else. `options.js` re-encodes every import through a
+   * canvas, so a crafted SVG or a file with a misleading extension cannot
+   * survive the round trip even before this check sees it.
+   */
+  const IMAGE_DATA_URL = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/;
+
+  /** Is this a custom background image this app is willing to render? */
+  function isImageData(value) {
+    return typeof value === 'string' && IMAGE_DATA_URL.test(value);
+  }
 
   /**
    * Gradient palettes. Each is three ambient blobs over a deep base, extending
@@ -130,10 +152,11 @@
    *
    * @param {Document} doc
    * @param {object} background Configuration, normalised internally.
-   * @param {object|null} photo Resolved Pexels photo, when type is 'photo'.
+   * @param {object|null} media Pixels for a 'photo' or 'image' background:
+   *   `{src, avgColor}`. A Pexels result and a stored data URL both fit.
    * @returns {string} The theme the caller should apply: 'light' or 'dark'.
    */
-  function apply(doc, background, photo) {
+  function apply(doc, background, media) {
     const config = normalize(background);
     const root = doc.documentElement;
     const style = root.style;
@@ -149,17 +172,25 @@
       return themeForColor(config.color);
     }
 
-    if (config.type === 'photo' && photo && photo.src) {
-      // Paint the photo's average colour immediately, so the tab is never a
-      // white flash while the image downloads.
-      style.setProperty('--ct-bg-deep', photo.avgColor || DEFAULTS.color);
+    const pictorial = config.type === 'photo' || config.type === 'image';
+    if (pictorial && media && media.src) {
+      // Paint an average colour immediately, so the tab is never a white flash
+      // while a large image decodes.
+      style.setProperty('--ct-bg-deep', media.avgColor || DEFAULTS.color);
       style.setProperty('--ct-blob-opacity', '0');
-      style.setProperty('--ct-photo-image', `url("${encodeURI(photo.src)}")`);
+      // encodeURI escapes the quote and backslash characters that could
+      // otherwise close the url() and inject a declaration.
+      style.setProperty('--ct-photo-image', `url("${encodeURI(media.src)}")`);
       style.setProperty('--ct-photo-overlay', String(config.overlay));
       style.setProperty('--ct-photo-blur', `${config.blur}px`);
-      // A photo sits under a dark scrim, so light text is always correct.
+      // A picture sits under a dark scrim, so light text is always correct.
       return 'dark';
     }
+
+    // A pictorial background with nothing to show falls through to the
+    // gradient, and must say so: `data-bg` drives the photo layer in CSS, and
+    // leaving it as 'photo' would keep the scrim over an empty layer.
+    if (pictorial) root.setAttribute('data-bg', 'gradient');
 
     // Gradient, and the fallback whenever a photo could not be resolved.
     const palette = GRADIENTS[config.gradient] || GRADIENTS[DEFAULTS.gradient];
@@ -210,6 +241,8 @@
     defaults: DEFAULTS,
     maxOverlay: MAX_OVERLAY,
     maxBlur: MAX_BLUR,
+    imageDataPattern: IMAGE_DATA_URL,
+    isImageData,
     parseHex,
     luminance,
     themeForColor,

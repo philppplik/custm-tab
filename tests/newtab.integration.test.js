@@ -68,6 +68,11 @@ describe('new tab page', () => {
     expect(order.indexOf('compat.js')).toBeLessThan(order.indexOf('store.js'));
     // dom.js consults CUSTM_URL when setting href/src.
     expect(order.indexOf('url.js')).toBeLessThan(order.indexOf('dom.js'));
+    // icons.js calls CUSTM_DOM.svg to build a glyph.
+    expect(order.indexOf('dom.js')).toBeLessThan(order.indexOf('icons.js'));
+    // store.js normalises through both of these at read time.
+    expect(order.indexOf('appearance.js')).toBeLessThan(order.indexOf('store.js'));
+    expect(order.indexOf('favicon.js')).toBeLessThan(order.indexOf('store.js'));
     // The controller runs last.
     expect(order.at(-1)).toBe('newtab.js');
   });
@@ -156,9 +161,152 @@ describe('new tab page', () => {
     });
     await boot();
 
-    // No key must mean no request, and a usable tab rather than a blank one.
-    expect(fetchSpy).not.toHaveBeenCalled();
+    // No key must mean nothing leaves the device, and a usable tab rather
+    // than a blank one. Asserted on the URLs rather than the call count:
+    // favicon resolution legitimately reads `chrome-extension://…/_favicon/`,
+    // which is an on-device cache lookup, not a request.
+    const offDevice = fetchSpy.mock.calls
+      .map(([url]) => String(url))
+      .filter((url) => !url.startsWith('chrome-extension://'));
+    expect(offDevice).toEqual([]);
     expect(document.documentElement.getAttribute('data-bg')).toBe('gradient');
+  });
+
+  /**
+   * "Your tab. Your rules." — the clock block is the part of the page a user
+   * is most likely to want gone, so each row has to actually disappear rather
+   * than merely empty itself and keep its gap.
+   */
+  describe('the clock block is the user choice', () => {
+    test('greets by time of day and appends the configured name', async () => {
+      chrome.storage.local.__seed({
+        appearance: { greeting: { mode: 'time', name: 'Philipp' } },
+      });
+      await boot();
+      expect(document.getElementById('greeting').textContent).toMatch(
+        /^Good (morning|afternoon|evening|night), Philipp$/
+      );
+    });
+
+    test('shows the user own headline instead, when they chose that', async () => {
+      chrome.storage.local.__seed({
+        appearance: { greeting: { mode: 'text', text: 'cust*m Tab' } },
+      });
+      await boot();
+      expect(document.getElementById('greeting').textContent).toBe('cust*m Tab');
+      // The stylesheet draws text mode as the headline rather than a caption.
+      expect(document.getElementById('clock-block').dataset.greeting).toBe('text');
+    });
+
+    test('hides the clock and the date when they are turned off', async () => {
+      chrome.storage.local.__seed({
+        appearance: { clock: { show: false }, date: { show: false } },
+      });
+      await boot();
+      expect(document.getElementById('clock').hidden).toBe(true);
+      expect(document.getElementById('date-line').hidden).toBe(true);
+      // The greeting is still on, so the block itself stays.
+      expect(document.getElementById('clock-block').hidden).toBe(false);
+    });
+
+    test('hides the whole block once every row inside it is off', async () => {
+      chrome.storage.local.__seed({
+        appearance: {
+          clock: { show: false },
+          date: { show: false },
+          greeting: { mode: 'none' },
+        },
+      });
+      await boot();
+      expect(document.getElementById('clock-block').hidden).toBe(true);
+    });
+
+    test('applies the chosen typeface and weight as custom properties', async () => {
+      chrome.storage.local.__seed({
+        appearance: { surface: 'frosted', clock: { font: 'serif', weight: 700 } },
+      });
+      await boot();
+
+      const root = document.documentElement;
+      expect(root.getAttribute('data-surface')).toBe('frosted');
+      expect(root.style.getPropertyValue('--ct-clock-weight')).toBe('700');
+      expect(root.style.getPropertyValue('--ct-clock-font')).toContain('serif');
+    });
+
+    test('a solid light surface drives the interface to dark text', async () => {
+      chrome.storage.local.__seed({
+        theme: 'auto',
+        appearance: { surface: 'solid', solidTone: 'light' },
+      });
+      await boot();
+      expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    });
+  });
+
+  describe('search engine marks', () => {
+    test('the picker renders vector glyphs, not emoji', async () => {
+      await boot();
+      const items = document.querySelectorAll('.engine-item__icon');
+      expect(items.length).toBeGreaterThan(0);
+      for (const item of items) {
+        expect(item.querySelector('svg')).not.toBeNull();
+        // Emoji would survive as text content; a glyph leaves none.
+        expect(item.textContent.trim()).toBe('');
+      }
+    });
+
+    test('the current engine button shows its own mark', async () => {
+      chrome.storage.local.__seed({ searchEngine: 'brave' });
+      await boot();
+      expect(document.querySelector('#engine-icon svg')).not.toBeNull();
+    });
+  });
+
+  describe('a background picture of the user own', () => {
+    const PIXEL =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+    test('renders the stored image without any network request', async () => {
+      const fetchSpy = vi.fn();
+      globalThis.fetch = fetchSpy;
+      chrome.storage.local.__seed({
+        background: { type: 'image' },
+        backgroundImage: PIXEL,
+      });
+      await boot();
+
+      expect(document.documentElement.getAttribute('data-bg')).toBe('image');
+      expect(
+        document.documentElement.style.getPropertyValue('--ct-photo-image')
+      ).toContain('data:image/png;base64');
+      const offDevice = fetchSpy.mock.calls
+        .map(([url]) => String(url))
+        .filter((url) => !url.startsWith('chrome-extension://'));
+      expect(offDevice).toEqual([]);
+    });
+
+    test('falls back to the gradient when no picture was ever chosen', async () => {
+      chrome.storage.local.__seed({ background: { type: 'image' }, backgroundImage: '' });
+      await boot();
+      expect(document.documentElement.getAttribute('data-bg')).toBe('gradient');
+    });
+
+    /**
+     * The value is interpolated into a CSS url() on a privileged extension
+     * origin, so a stored string that is not one of the raster data URLs this
+     * app writes must never reach the stylesheet.
+     */
+    test('discards a stored value that is not a raster data URL', async () => {
+      chrome.storage.local.__seed({
+        background: { type: 'image' },
+        backgroundImage: 'data:image/svg+xml,<svg onload="alert(1)"/>',
+      });
+      await boot();
+      expect(document.documentElement.getAttribute('data-bg')).toBe('gradient');
+      expect(document.documentElement.style.getPropertyValue('--ct-photo-image')).toBe(
+        'none'
+      );
+    });
   });
 
   test('runs the sunrise reveal by default', async () => {

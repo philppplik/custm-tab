@@ -173,4 +173,95 @@ describe('CUSTM_STORE', () => {
       expect([...store.keys].sort()).toEqual(Object.keys(store.defaults).sort());
     });
   });
+
+  /**
+   * The suite above loads store.js with only its two hard dependencies, which
+   * exercises the graceful-degradation guards. These load the full set a real
+   * page loads, so the delegated normalisation actually runs.
+   */
+  describe('with every normaliser present', () => {
+    beforeEach(async () => {
+      await loadScripts(
+        'compat.js',
+        'url.js',
+        'dom.js',
+        'icons.js',
+        'favicon.js',
+        'appearance.js',
+        'backgrounds.js',
+        'store.js'
+      );
+      store = globalThis.CUSTM_STORE;
+    });
+
+    test('repairs an appearance object that arrived corrupted', async () => {
+      chrome.storage.local.__seed({
+        appearance: { surface: 'liquid', clock: { size: 500, font: 'Wingdings' } },
+      });
+
+      const settings = await store.getAll();
+      expect(settings.appearance.surface).toBe('glass');
+      expect(settings.appearance.clock.size).toBe(globalThis.CUSTM_APPEARANCE.maxSize);
+      expect(settings.appearance.clock.font).toBe('system');
+    });
+
+    test('accepts the site icon mode added for the favicon fix', async () => {
+      chrome.storage.local.__seed({ iconMode: 'site' });
+      expect((await store.getAll()).iconMode).toBe('site');
+    });
+
+    test('falls back to the default icon mode for an unknown value', async () => {
+      chrome.storage.local.__seed({ iconMode: 'google-beacon' });
+      expect((await store.getAll()).iconMode).toBe('local');
+    });
+
+    describe('the background picture', () => {
+      const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==';
+
+      test('keeps a raster data URL this app could have written', async () => {
+        chrome.storage.local.__seed({ backgroundImage: PNG });
+        expect((await store.getAll()).backgroundImage).toBe(PNG);
+      });
+
+      /**
+       * The value is interpolated into a CSS url() on a privileged extension
+       * origin. Anything outside the three raster types is discarded rather
+       * than sanitised — there is no legitimate reason for it to be there.
+       */
+      test('discards anything that is not one of the three raster types', async () => {
+        const hostile = [
+          'data:image/svg+xml;base64,PHN2Zy8+',
+          'data:text/html;base64,PHNjcmlwdD4=',
+          'https://evil.example/pic.png',
+          'javascript:alert(1)',
+          'data:image/png;base64,abc");background:url(https://evil.example',
+          42,
+          {},
+        ];
+        for (const value of hostile) {
+          chrome.storage.local.__seed({ backgroundImage: value });
+          expect((await store.getAll()).backgroundImage, String(value)).toBe('');
+        }
+      });
+
+      test('is never synced — one picture exceeds the whole sync quota', () => {
+        expect(store.neverSyncKeys).toContain('backgroundImage');
+        expect(store.syncKeys).not.toContain('backgroundImage');
+      });
+
+      test('is left out of a settings export, along with the credentials', () => {
+        const exported = store.toExport({
+          theme: 'dark',
+          backgroundImage: PNG,
+          pexelsApiKey: 'secret',
+        });
+        expect(exported).toEqual({ theme: 'dark' });
+      });
+    });
+
+    test('appearance is syncable, since it holds no credential and no blob', () => {
+      expect(store.syncKeys).toContain('appearance');
+      expect(store.neverSyncKeys).not.toContain('appearance');
+    });
+  });
 });
