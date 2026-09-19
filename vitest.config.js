@@ -17,9 +17,11 @@ export default defineConfig({
       // keeps the threshold meaningful instead of diluted by files no unit test
       // can reach. Add each new testable module here.
       include: [
+        'extension/backgrounds.js',
         'extension/compat.js',
         'extension/dom.js',
         'extension/favicon.js',
+        'extension/pexels.js',
         'extension/search-engines.js',
         'extension/store.js',
         'extension/url.js',

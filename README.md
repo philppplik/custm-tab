@@ -13,6 +13,8 @@ cust*m Tab replaces your new tab with either a **privacy-first dashboard** or
 **your own URL** — your choice, configured in 30 seconds via an onboarding
 wizard.
 
+Works in **Chrome 121+** and **Firefox 142+** from one source tree.
+
 ## Why cust*m Tab
 
 <img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Privacy by default.** DuckDuckGo and Brave are the top two default search options. No telemetry, no tracking, no accounts.

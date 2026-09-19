@@ -163,6 +163,201 @@
           </details>
         </section>
 
+        <!-- Background -->
+        <section class="ct-card">
+          <h2 class="card-title">Background</h2>
+          <p class="card-sub">Your tab, your view.</p>
+
+          <div class="bg-type" role="radiogroup" aria-label="Background type">
+            <button
+              class="bg-type__opt"
+              type="button"
+              data-bg-type="gradient"
+              id="bg-type-gradient"
+              role="radio"
+              aria-checked="true"
+            >
+              <span
+                class="bg-type__swatch bg-type__swatch--gradient"
+                aria-hidden="true"
+              ></span>
+              <span class="bg-type__label">Gradient</span>
+            </button>
+            <button
+              class="bg-type__opt"
+              type="button"
+              data-bg-type="color"
+              role="radio"
+              aria-checked="false"
+            >
+              <span
+                class="bg-type__swatch bg-type__swatch--color"
+                aria-hidden="true"
+              ></span>
+              <span class="bg-type__label">Solid colour</span>
+            </button>
+            <button
+              class="bg-type__opt"
+              type="button"
+              data-bg-type="photo"
+              role="radio"
+              aria-checked="false"
+            >
+              <span
+                class="bg-type__swatch bg-type__swatch--photo"
+                aria-hidden="true"
+              ></span>
+              <span class="bg-type__label">Photo</span>
+            </button>
+          </div>
+
+          <!-- Gradient -->
+          <div class="sub-settings" id="bg-gradient-settings">
+            <span class="field__label">Palette</span>
+            <div
+              class="palette-row"
+              id="gradient-palette"
+              role="radiogroup"
+              aria-label="Gradient palette"
+            ></div>
+          </div>
+
+          <!-- Solid colour -->
+          <div class="sub-settings" id="bg-color-settings" hidden>
+            <span class="field__label">Colour</span>
+            <div
+              class="palette-row"
+              id="color-swatches"
+              role="radiogroup"
+              aria-label="Preset colours"
+            ></div>
+            <div class="color-custom">
+              <input
+                type="color"
+                id="bg-color-input"
+                class="color-input"
+                aria-label="Custom background colour"
+              />
+              <input
+                type="text"
+                id="bg-color-hex"
+                class="ct-input color-hex"
+                spellcheck="false"
+                aria-label="Background colour hex value"
+                placeholder="#180646"
+              />
+              <span id="bg-contrast-note" class="field__hint"></span>
+            </div>
+          </div>
+
+          <!-- Photo -->
+          <div class="sub-settings" id="bg-photo-settings" hidden>
+            <div class="field">
+              <label class="field__label" for="pexels-key">Pexels API key</label>
+              <div class="input-wrapper">
+                <input
+                  type="password"
+                  id="pexels-key"
+                  class="ct-input"
+                  spellcheck="false"
+                  autocomplete="off"
+                  placeholder="Paste your key"
+                  aria-describedby="pexels-key-hint"
+                />
+              </div>
+              <p id="pexels-key-hint" class="field__hint">
+                Free, instant, and yours:
+                <a
+                  href="https://www.pexels.com/api/key/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >get a key</a
+                >. It is stored on this device only, never synced, and never leaves the
+                browser except in the request to Pexels.
+              </p>
+              <div class="page-actions page-actions--tight">
+                <button type="button" id="pexels-test" class="ct-btn-ghost">
+                  Test key
+                </button>
+                <span id="pexels-status" class="save-feedback" aria-live="polite"></span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="pexels-query">Search term</label>
+              <input
+                type="text"
+                id="pexels-query"
+                class="ct-input"
+                placeholder="mountains, architecture, ocean… (empty = curated)"
+                maxlength="80"
+              />
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label class="field__label" for="pexels-orientation">Orientation</label>
+                <select id="pexels-orientation" class="ct-input">
+                  <option value="landscape">Landscape</option>
+                  <option value="portrait">Portrait</option>
+                  <option value="square">Square</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field__label" for="pexels-refresh">New photo</label>
+                <select id="pexels-refresh" class="ct-input">
+                  <option value="tab">Every new tab</option>
+                  <option value="hourly">Every hour</option>
+                  <option value="daily">Every day</option>
+                </select>
+              </div>
+            </div>
+            <p class="field__hint">
+              One request fetches a page of photos that is then rotated on this device, so
+              even “every new tab” touches the network only a couple of times a day and
+              stays well inside the Pexels rate limit.
+            </p>
+
+            <div class="field">
+              <label class="field__label" for="bg-overlay"
+                >Darken <span id="bg-overlay-value" class="field__value">35%</span></label
+              >
+              <input
+                type="range"
+                id="bg-overlay"
+                class="range-input"
+                min="0"
+                max="80"
+                step="5"
+              />
+            </div>
+            <div class="field">
+              <label class="field__label" for="bg-blur"
+                >Blur <span id="bg-blur-value" class="field__value">0px</span></label
+              >
+              <input
+                type="range"
+                id="bg-blur"
+                class="range-input"
+                min="0"
+                max="24"
+                step="1"
+              />
+            </div>
+          </div>
+
+          <label class="toggle-row">
+            <input type="checkbox" id="toggle-sunrise" class="toggle-checkbox" />
+            <span class="toggle-label">
+              Sunrise reveal
+              <span class="toggle-hint"
+                >The background rises and blooms when a tab opens. Skipped automatically
+                if your system asks for reduced motion.</span
+              >
+            </span>
+          </label>
+        </section>
+
         <!-- Sync card -->
         <section class="ct-card card--secondary">
           <details class="details-block">
@@ -221,6 +416,8 @@
     <script src="url.js"></script>
     <script src="dom.js"></script>
     <script src="favicon.js"></script>
+    <script src="backgrounds.js"></script>
+    <script src="pexels.js"></script>
     <script src="search-engines.js"></script>
     <script src="store.js"></script>
     <script src="options.js"></script>
