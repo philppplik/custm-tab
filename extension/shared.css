@@ -149,11 +149,16 @@
 }
 
 /* ── Shared components ───────────────────────────── */
+/* Cards carry long-form settings copy, so they take a heavier, more opaque
+   version of the chosen material than the new-tab chrome does. Glass at 12%
+   over an aurora gradient looks wonderful and cannot be read. */
 .ct-card {
-  background: var(--ct-glass-card);
-  border: 1px solid var(--ct-glass-border);
+  background: var(--ct-card-bg);
+  border: 1px solid var(--ct-surface-border);
   border-radius: var(--ct-radius-md);
   box-shadow: var(--ct-shadow-lg);
+  backdrop-filter: var(--ct-surface-blur);
+  -webkit-backdrop-filter: var(--ct-surface-blur);
   padding: 28px;
 }
 .ct-btn-primary {
@@ -212,6 +217,130 @@
 }
 
 /* ============================================================
+   Surface materials
+   Driven by the data-surface attribute appearance.js sets on
+   <html>. Every raised surface in the product — the search
+   shell, the engine menu, bookmark tiles, cards, modals —
+   draws from these four properties and nothing else, so a
+   material is defined once here rather than per component.
+
+   glass    translucent, lightly blurred. The default.
+   frosted  heavier blur plus saturation. Saturation is what
+            separates frosted glass from a grey panel: real
+            glass intensifies the colour behind it.
+   solid    opaque, no blur at all. Not a downgrade — a
+            full-viewport backdrop-filter is the single most
+            expensive thing this page paints, and on a weak
+            GPU this is the version that opens instantly.
+            Its tone is the theme, so light means white
+            surfaces and dark means near-black ones.
+   ============================================================ */
+
+:root {
+  --ct-surface-blur: blur(20px) saturate(180%);
+  --ct-surface-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  --ct-surface-border: rgba(255, 255, 255, 0.18);
+  /* The bright top edge is what sells glass: it reads as light catching a
+     bevel. Without it a translucent panel looks like a flat wash. */
+  --ct-surface-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  --ct-surface-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --ct-card-bg: rgba(27, 19, 43, 0.78);
+
+  /* A floating menu needs its own, far more opaque material than the chrome
+     it opens from. At the surface's own 12% white, the bookmark tiles behind
+     it stayed perfectly legible through the panel — which looks exactly like
+     the menu opening *underneath* them, whatever the paint order says.
+     Apple's menus solve it the same way: heavy blur, high opacity, glass
+     only at the edges. */
+  --ct-menu-bg: rgba(24, 18, 38, 0.88);
+  --ct-menu-blur: blur(30px) saturate(180%);
+}
+
+:root[data-surface='frosted'] {
+  --ct-surface-blur: blur(44px) saturate(200%) brightness(1.06);
+  --ct-surface-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  --ct-surface-border: rgba(255, 255, 255, 0.28);
+  --ct-surface-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --ct-card-bg: rgba(27, 19, 43, 0.58);
+  --ct-menu-bg: rgba(24, 18, 38, 0.76);
+  --ct-menu-blur: blur(48px) saturate(200%);
+}
+
+:root[data-surface='solid'] {
+  --ct-surface-blur: none;
+  --ct-surface-bg: #191426;
+  --ct-surface-border: rgba(255, 255, 255, 0.1);
+  --ct-surface-highlight: none;
+  --ct-surface-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+  --ct-card-bg: #191426;
+  --ct-menu-bg: #191426;
+  --ct-menu-blur: none;
+}
+
+:root[data-surface='solid'][data-theme='light'] {
+  --ct-surface-bg: #ffffff;
+  --ct-surface-border: rgba(27, 19, 43, 0.12);
+  --ct-surface-shadow: 0 14px 34px rgba(41, 5, 142, 0.14);
+  --ct-card-bg: #ffffff;
+  --ct-menu-bg: #ffffff;
+  --ct-menu-blur: none;
+}
+
+/* Light theme needs the inverse tint: darkening glass over a pale background
+   is what makes it visible, where white-on-white would vanish. */
+:root[data-theme='light'] {
+  --ct-surface-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+  --ct-surface-border: rgba(27, 19, 43, 0.14);
+  --ct-surface-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --ct-surface-shadow: 0 18px 50px rgba(41, 5, 142, 0.16);
+  --ct-card-bg: rgba(255, 255, 255, 0.9);
+  --ct-menu-bg: rgba(252, 251, 255, 0.92);
+  --ct-menu-blur: blur(30px) saturate(180%);
+}
+
+:root[data-theme='light'][data-surface='frosted'] {
+  --ct-surface-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.62) 100%
+  );
+  --ct-card-bg: rgba(255, 255, 255, 0.72);
+  --ct-menu-bg: rgba(252, 251, 255, 0.82);
+  --ct-menu-blur: blur(48px) saturate(200%);
+}
+
+/* The one shared surface rule. Anything that wants to be made of the
+   user's chosen material applies this class or copies these four lines. */
+.ct-surface {
+  background: var(--ct-surface-bg);
+  border: 1px solid var(--ct-surface-border);
+  box-shadow: var(--ct-surface-shadow), var(--ct-surface-highlight);
+  backdrop-filter: var(--ct-surface-blur);
+  -webkit-backdrop-filter: var(--ct-surface-blur);
+}
+
+/* ── Clock and greeting typography ───────────────────
+   Values come from appearance.js. Declared here with fallbacks so a page
+   that never calls apply() still renders sensibly. */
+:root {
+  --ct-clock-font: var(--ct-font);
+  --ct-clock-weight: 200;
+  --ct-clock-scale: 1;
+}
+
+/* ============================================================
    Background engine — photo layer and the sunrise reveal
    Driven by custom properties that backgrounds.js sets on <html>.
    ============================================================ */
@@ -250,7 +379,8 @@
 
 /* Scrim. Without it, white text over a bright photo is unreadable — and the
    user controls the strength rather than us guessing a single value. */
-:root[data-bg='photo'] .ct-ambient::before {
+:root[data-bg='photo'] .ct-ambient::before,
+:root[data-bg='image'] .ct-ambient::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -262,8 +392,9 @@
   );
 }
 
-/* A photo supplies its own depth; the heavy blur would only mud it. */
+/* A picture supplies its own depth; the heavy blur would only mud it. */
 :root[data-bg='photo'] .ct-blur,
+:root[data-bg='image'] .ct-blur,
 :root[data-bg='color'] .ct-blur {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;

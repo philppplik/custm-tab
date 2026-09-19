@@ -148,6 +148,15 @@
 .field {
   margin-bottom: 14px;
 }
+/* A field following a toggle had no separation at all, so its label read as
+   a third line of the toggle's hint text rather than a new control. Rhythm
+   between groups, not uniform padding everywhere. */
+.toggle-row + .field,
+.toggle-row + .sub-settings,
+.sub-settings + .toggle-row,
+.field + .toggle-row {
+  margin-top: 18px;
+}
 .field__label {
   display: block;
   font-size: 0.85rem;
@@ -257,10 +266,14 @@
   gap: 10px;
   margin-top: 10px;
 }
+/* Tinted from the text colour rather than from a fixed black, so one rule
+   works in both themes. The hard-coded rgba(0,0,0,.25) produced mid-grey
+   chips on a white card, where the selected one was indistinguishable from
+   the other two — a radio group with no visible selection. */
 .theme-chip {
   flex: 1;
   padding: 12px;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgb(from var(--ct-text) r g b / 0.08);
   border: 1.5px solid var(--ct-glass-border-soft);
   border-radius: var(--ct-radius-sm);
   color: var(--ct-text);
@@ -270,11 +283,12 @@
   transition: 0.2s;
 }
 .theme-chip:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgb(from var(--ct-text) r g b / 0.14);
 }
 .theme-chip.active {
   border-color: var(--ct-accent);
-  background: rgba(255, 51, 0, 0.12);
+  background: rgb(255 51 0 / 0.14);
+  font-weight: 600;
 }
 
 /* Actions */
@@ -296,9 +310,11 @@
 
 /* ── Background picker ──────────────────────────────
    Three-way type switch, palette chips, and the photo controls. */
+/* auto-fit rather than a fixed column count: a fourth background type was
+   added here, and the next one should not need this line edited again. */
 .bg-type {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
   gap: 10px;
   margin-bottom: 18px;
 }
@@ -341,6 +357,40 @@
   background:
     linear-gradient(200deg, rgb(0 0 0 / 0.45), transparent),
     linear-gradient(60deg, #3d5a80, #98c1d9 60%, #ee6c4d);
+}
+/* Reads as a picture frame rather than a photo, so the two picture options
+   are distinguishable at a glance. */
+.bg-type__swatch--image {
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.18), transparent 60%),
+    repeating-linear-gradient(45deg, #2b2340 0 6px, #372c52 6px 12px);
+  border: 1.5px dashed rgb(255 255 255 / 0.35);
+}
+
+/* ── Own-image picker ───────────────────────────────
+   The file input itself is hidden but kept focusable and in the accessibility
+   tree — its own label is the visible control. `display: none` would take it
+   out of the tab order entirely. */
+.image-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.image-picker__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.image-picker__button {
+  display: inline-block;
+}
+.image-picker__input:focus-visible + .image-picker__button {
+  outline: 2px solid var(--ct-text);
+  outline-offset: 3px;
 }
 
 .palette-row {
