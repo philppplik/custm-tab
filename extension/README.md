@@ -1,73 +1,117 @@
 # cust*m Tab
 
-> **Your tab. Your rules.** — A custom new-tab page for Chrome (MV3), built hybrid-ready for Firefox/Brave/Edge.
+> **Your tab. Your rules.** A new-tab page for Chrome and Firefox, from one
+> Manifest V3 source tree.
 
-cust*m Tab replaces your new tab with either a **privacy-first dashboard** (bookmarks, search, clock) or your **own URL** — your choice, configured in 30 seconds via an onboarding wizard.
+cust*m Tab replaces the new tab with either a **dashboard you configure**
+(bookmarks, search, clock) or **a URL of your own**. Four-step wizard on first
+run.
+
+This is the package that ships. For the project overview see the
+[repository README](../README.md); for architecture see
+[TECHNICAL.md](TECHNICAL.md).
 
 ## Two modes
 
-| Mode                    | What it does                                                                                                                                                             |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Dashboard** (default) | Gradient startpage with live clock, greeting, search bar + engine picker, and editable bookmark tiles.                                                                   |
-| **Redirect**            | Loads any `https://`, `http://`, `file://`, or `chrome-extension://` URL as your new tab. Optionally embedded in an iframe to keep the extension URL in the address bar. |
+| Mode                    | What it does                                                                                                                                               |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Dashboard** (default) | Clock, greeting, search bar with an engine picker, and editable bookmark tiles over a background you choose.                                               |
+| **Redirect**            | Loads any `https:`, `http:`, `file:`, `chrome-extension:` or `moz-extension:` URL as your new tab, optionally inside a frame so the address bar stays put. |
 
-Switch modes anytime in Settings.
+Switch at any time in Settings.
 
 ## Features
 
-- **Privacy-first search** — 5 curated engines in the dashboard picker (DuckDuckGo, Brave, Startpage, Ecosia, Google) + 20+ more in Settings. Each shows a privacy badge (privat / mittel / tracking).
-- **Onboarding wizard** — opens on first install; picks mode, bookmarks, search engine, and theme in 4 steps.
-- **Persistent storage** — bookmarks & settings live in `chrome.storage.local` (profile-scoped, correct for an extension; no silent `localStorage` loss).
-- **Alarm-based persistence monitor** — warns if Chrome disables the override.
-- **Light / Dark / Auto theme**, applied across all pages.
-- **No frameworks** — vanilla HTML/CSS/JS, total weight well under 50 KB.
+- **Backgrounds** - six gradient palettes, any solid colour, or a Pexels photo.
+  A flat colour drives its own text contrast from WCAG relative luminance, so a
+  pale choice stays readable.
+- **Sunrise reveal** - the background rises and blooms as the tab opens, on the
+  compositor. Suppressed under `prefers-reduced-motion`.
+- **26 search engines** - five curated in the dashboard picker, all of them in
+  Settings, each with an honest privacy badge.
+- **Omnibox** - type `ct` in the address bar; `ct brave cats` forces an engine.
+- **Bookmarks** - add, edit, delete and drag to reorder directly on the tab.
+- **Private by default** - icons resolve on-device, with locally drawn letter
+  tiles as the fallback. The remote icon source is opt-in.
+- **Opt-in sync** - preferences only. Bookmarks and the Pexels key never leave
+  the device.
+- **Persistence monitor** - an hourly alarm warns if the browser silently drops
+  the new-tab override.
+- **No frameworks, no build step** - vanilla HTML, CSS and JavaScript.
 
-## Install (development)
+## Install for development
 
-1. Open Chrome → `chrome://extensions`
-2. Enable **Developer mode** (top-right toggle)
-3. Click **Load unpacked** → select the `extension/` folder
-4. A new tab opens the **onboarding wizard**
+**Chrome, Edge, Brave** - open `chrome://extensions`, enable Developer mode,
+choose _Load unpacked_, select this `extension/` folder.
+
+**Firefox** - open `about:debugging#/runtime/this-firefox`, choose _Load
+Temporary Add-on_, select `manifest.json` in this folder.
+
+For store packages run `npm run build` from the repository root; it emits a
+per-browser build into `dist/`.
 
 ## File structure
 
 ```
 extension/
-├── manifest.json          # MV3 manifest (Firefox-ready via browser_specific_settings)
-├── background.js          # Service worker (onboarding, persistence alarm)
-├── newtab.html/css/js     # New tab override (dashboard OR redirect)
-├── options.html/css/js    # Settings page (mode, URL, engine, theme)
-├── wizard.html/css/js     # First-run onboarding (4 steps)
-├── howto.html/css         # In-app documentation
-├── search-engines.js      # Engine registry (5 top + 20+ extended)
-├── store.js               # Shared storage layer + schema defaults
-├── shared.css             # Design system (gradient/glass vars, page frame)
-├── custmTab-logo.svg      # Brand logo (referenced by all pages)
-└── icons/                 # PNG icons (16/32/48/128) + source SVG
+├── manifest.json        MV3. Declares both background keys, one per browser.
+├── compat.js            CUSTM_API: browser ?? chrome. Load first on every page.
+├── url.js               CUSTM_URL: protocol allowlist and normalisation.
+├── dom.js               CUSTM_DOM: safe element construction, never innerHTML.
+├── favicon.js           CUSTM_FAVICON: on-device, monogram, or opt-in remote.
+├── backgrounds.js       CUSTM_BACKGROUND: palettes, contrast, sunrise reveal.
+├── pexels.js            CUSTM_PEXELS: BYO-key client with local page caching.
+├── search-engines.js    Engine registry, also loaded by the background context.
+├── store.js             CUSTM_STORE: schema, normalisation, optional sync.
+├── background.js        Service worker (Chrome) / event page (Firefox).
+├── newtab.html/css/js   New tab override: dashboard or redirect.
+├── options.html/css/js  Settings.
+├── wizard.html/css/js   First-run onboarding.
+├── howto.html/css/js    In-app documentation.
+├── shared.css           Design tokens, ambient background, sunrise keyframes.
+├── custmTab-logo.svg    Brand mark.
+└── icons/               16/32/48/128 PNG plus the source SVG.
 ```
 
-> Note: icon PNGs are committed directly; the older `generate-icons.js` / `create-icons.html`
-> generators referenced in earlier docs are not required for loading the extension.
+**Load order matters.** `compat.js` defines `CUSTM_API`, which `store.js` reads
+at evaluation time, and `dom.js` consults `CUSTM_URL` when setting `href` or
+`src`. `tests/newtab.integration.test.js` asserts the order declared in
+`newtab.html` actually satisfies those dependencies.
 
-## Search engines
+## Adding a search engine
 
-`search-engines.js` is the single source of truth. `top` engines appear in the
-dashboard dropdown; all engines are selectable in Settings. Add an entry to the
-`ENGINES` array to ship a new engine — no other file needs to change.
+`search-engines.js` is the single source of truth. Append one object to
+`ENGINES` with a `{query}` placeholder in `url`; nothing else needs changing.
+Set `privacy` honestly: `low` means that provider builds a profile.
 
 ## Cross-browser
 
-The manifest is MV3 with `browser_specific_settings.gecko` set, so it loads in
-Chrome, Edge, Brave, and (MV3-capable) Firefox. Firefox MV3 support is still
-gated behind `extensions.manifestV3.enabled` in some versions; if you need broad
-Firefox coverage today, ship an MV2 variant (drop `browser_specific_settings`
-and the service worker to a background page).
+One source tree, two targets. The differences are absorbed rather than
+duplicated:
 
-## Stack
+| Difference                                             | How it is handled                                                                   |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| Firefox `chrome.*` is callback-only                    | `compat.js` resolves `browser ?? chrome`, so `await` works in both.                 |
+| Firefox MV3 has no service worker                      | The manifest declares `background.scripts` too; `build.mjs` keeps one per target.   |
+| `importScripts` does not exist on a Firefox event page | Guarded in `background.js`; `background.scripts` loads the registry there instead.  |
+| `favicon` is a Chrome-only permission                  | `build.mjs` strips it from the Firefox package, which falls back to monogram tiles. |
+| AMO requires a data-collection declaration             | `browser_specific_settings.gecko.data_collection_permissions` is set to `["none"]`. |
 
-- **Manifest V3** — no persistent background scripts
-- **No frameworks** — vanilla HTML/CSS/JS, < 50 KB
-- **Permissions**: `tabs`, `storage`, `alarms`, `notifications`
+Minimum versions: **Chrome 121** (promise-returning APIs, and `background.scripts`
+is rejected before it) and **Firefox 142** (`data_collection_permissions`).
+
+## Permissions
+
+| Permission                             | Why                                                                   |
+| -------------------------------------- | --------------------------------------------------------------------- |
+| `storage`                              | Persist settings and bookmarks on the device.                         |
+| `alarms`                               | Hourly persistence check.                                             |
+| `notifications`                        | Report the result of that check.                                      |
+| `favicon` (Chrome only)                | Resolve bookmark icons locally instead of via a third party.          |
+| `api.pexels.com` (optional, on demand) | Requested when photo backgrounds are enabled, released when disabled. |
+
+There are no `host_permissions`. `npm run validate:manifest` fails the build if
+any appear, or if a permission outside this table is added.
 
 ## License
 

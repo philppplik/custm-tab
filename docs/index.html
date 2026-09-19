@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>cust*m Tab - Your tab. Your rules.</title>
+    <meta
+      name="description"
+      content="A privacy-first new tab for Chrome and Firefox. Bookmarks, 26 search engines, gradients, solid colours or Pexels photos. No telemetry, no accounts, no tracking."
+    />
+    <link rel="icon" href="assets/custmTab-logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+
+    <meta property="og:title" content="cust*m Tab - Your tab. Your rules." />
+    <meta
+      property="og:description"
+      content="A privacy-first new tab for Chrome and Firefox. No telemetry, no accounts, no tracking."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://philppplik.github.io/custm-tab/" />
+    <meta
+      property="og:image"
+      content="https://philppplik.github.io/custm-tab/assets/01-dashboard-aurora.jpg"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true">
+      <span class="a"></span>
+      <span class="b"></span>
+      <span class="c"></span>
+    </div>
+
+    <header class="nav">
+      <div class="shell">
+        <a class="brand" href="./">
+          <img src="assets/custmTab-logo.svg" alt="" />
+          cust*m Tab
+        </a>
+        <nav class="nav-links">
+          <a href="#what">What it does</a>
+          <a href="#privacy">Privacy</a>
+          <a href="#install">Install</a>
+          <a
+            class="btn btn-primary"
+            href="https://github.com/philppplik/custm-tab/releases/latest"
+            >Download</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero: asymmetric split. Four text elements, no more. -->
+      <section class="hero">
+        <div class="shell">
+          <div>
+            <span class="eyebrow">Chrome and Firefox</span>
+            <h1>Your tab.<br /><em>Your rules.</em></h1>
+            <p>
+              A new tab that answers to you. No account, no telemetry, nothing phoning
+              home.
+            </p>
+            <div class="hero-actions">
+              <a
+                class="btn btn-primary"
+                href="https://github.com/philppplik/custm-tab/releases/latest"
+                >Download v1.2.1</a
+              >
+              <a class="btn btn-ghost" href="https://github.com/philppplik/custm-tab"
+                >View source</a
+              >
+            </div>
+          </div>
+          <img
+            class="shot"
+            src="assets/01-dashboard-aurora.jpg"
+            width="1280"
+            height="800"
+            alt="The cust*m Tab dashboard showing a clock, a search bar and bookmark tiles over a purple and orange gradient"
+            fetchpriority="high"
+          />
+        </div>
+      </section>
+
+      <!-- Showcase: horizontal scroll-snap rail -->
+      <section class="showcase reveal" id="what">
+        <div class="shell">
+          <h2>One tab, three ways to look at it</h2>
+          <p>
+            Pick a gradient, a flat colour, or a photo. The interface works out its own
+            contrast, so a pale background stays readable instead of being forbidden.
+          </p>
+        </div>
+        <div class="rail">
+          <figure>
+            <img
+              src="assets/01-dashboard-aurora.jpg"
+              width="1280"
+              height="800"
+              loading="lazy"
+              alt="Dashboard with the Aurora gradient background"
+            />
+            <figcaption><b>Aurora.</b> Six gradient palettes ship with it.</figcaption>
+          </figure>
+          <figure>
+            <img
+              src="assets/02-dashboard-tide.jpg"
+              width="1280"
+              height="800"
+              loading="lazy"
+              alt="Dashboard with the Tide gradient background in teal and green"
+            />
+            <figcaption><b>Tide.</b> Same tab, a different mood.</figcaption>
+          </figure>
+          <figure>
+            <img
+              src="assets/03-dashboard-light.jpg"
+              width="1280"
+              height="800"
+              loading="lazy"
+              alt="Dashboard on a pale solid colour, with the interface switched to dark text"
+            />
+            <figcaption>
+              <b>Any colour you like.</b> Text flips to dark on its own.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Privacy: editorial statement plus a plain ledger -->
+      <section class="privacy reveal" id="privacy">
+        <div class="shell">
+          <blockquote>
+            The last version shipped a tracker <span>wearing an icon.</span>
+          </blockquote>
+          <p style="margin-top: 24px; color: var(--ink-dim); max-width: 58ch">
+            Every bookmark tile used to fetch its icon from Google, on every new tab. That
+            handed Google the list of sites you had pinned and a heartbeat of how often
+            you opened a tab. It is gone. Icons now resolve on your own machine.
+          </p>
+
+          <dl class="ledger">
+            <div>
+              <dt>Accounts</dt>
+              <dd>None. There is nothing to sign in to.</dd>
+            </div>
+            <div>
+              <dt>Telemetry</dt>
+              <dd>None. No analytics, no crash pings.</dd>
+            </div>
+            <div>
+              <dt>Your data</dt>
+              <dd>Stays in your browser profile.</dd>
+            </div>
+            <div>
+              <dt>Network access</dt>
+              <dd>Only when you search or turn on photos.</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <!-- Bento: five cells for five things -->
+      <section class="features reveal">
+        <div class="shell">
+          <h2>Built so you can change your mind</h2>
+          <div class="bento">
+            <div class="cell">
+              <h3>26 search engines, privacy-forward first</h3>
+              <p>
+                DuckDuckGo and Brave lead the list. Every engine carries an honest badge,
+                so you can see which ones build a profile of you before you pick one. Type
+                <code>ct</code> in the address bar to search without opening a tab at all.
+              </p>
+            </div>
+            <div class="cell">
+              <h3>Bookmarks you edit in place</h3>
+              <p>
+                Add, rename, delete and drag to reorder, right on the tab. No settings
+                round trip.
+              </p>
+            </div>
+            <div class="cell">
+              <h3>Or skip the dashboard</h3>
+              <p>
+                Point the new tab at any URL you like, including a local file or another
+                extension page.
+              </p>
+            </div>
+            <div class="cell">
+              <h3>Sunrise reveal</h3>
+              <p>
+                The background rises and blooms as the tab opens. It steps aside
+                automatically if your system asks for reduced motion.
+              </p>
+            </div>
+            <div class="cell">
+              <h3>Sync is opt-in</h3>
+              <p>
+                Mirror your settings across devices if you want to. Bookmarks stay on the
+                machine they belong to.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Photo backgrounds: split -->
+      <section class="photos reveal">
+        <div class="shell">
+          <div>
+            <h2>Photo backgrounds, on your own key</h2>
+            <p>
+              Point it at Pexels with a search term and get a new photo every day, every
+              hour, or every single tab. The photographer is always credited.
+            </p>
+            <p>
+              You supply the API key, because anything bundled into an extension is
+              public. It is stored on your device, never synced, and sent only to Pexels.
+              One request caches a page of photos that is then shuffled locally, so even
+              the most frequent setting touches the network a few times a day.
+            </p>
+            <p style="margin-top: 22px">
+              <a
+                class="inline"
+                href="https://github.com/philppplik/custm-tab/blob/main/docs/PEXELS.md"
+                >Read the setup guide</a
+              >
+            </p>
+          </div>
+          <img
+            class="shot"
+            src="assets/05-settings-photo.jpg"
+            width="1280"
+            height="800"
+            loading="lazy"
+            alt="The settings page showing the Pexels API key field, search term, orientation, refresh interval, and darken and blur sliders"
+          />
+        </div>
+      </section>
+
+      <!-- Install -->
+      <section class="install reveal" id="install">
+        <div class="shell">
+          <h2>Install it</h2>
+          <p>
+            Store listings are in review. Until they are live, the packages from the
+            latest release install in a minute.
+          </p>
+          <div class="hero-actions">
+            <a
+              class="btn btn-primary"
+              href="https://github.com/philppplik/custm-tab/releases/latest"
+              >Download v1.2.1</a
+            >
+            <a class="btn btn-ghost" href="https://github.com/philppplik/custm-tab"
+              >View source</a
+            >
+          </div>
+
+          <ol class="steps">
+            <li>
+              <b>Chrome, Edge or Brave.</b> Unzip <code>custm-tab-chrome-1.2.1.zip</code>,
+              open <code>chrome://extensions</code>, turn on Developer mode, then choose
+              Load unpacked and select the folder.
+            </li>
+            <li>
+              <b>Firefox.</b> Open <code>about:debugging#/runtime/this-firefox</code>,
+              choose Load Temporary Add-on, and select <code>manifest.json</code> from the
+              unzipped Firefox package.
+            </li>
+            <li>
+              <b>That is it.</b> A setup wizard opens on first run. Four steps, then your
+              tab is yours.
+            </li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <div class="shell">
+        <p>MIT licensed. Built in the open.</p>
+        <nav>
+          <a href="https://github.com/philppplik/custm-tab">GitHub</a>
+          <a href="privacy.html">Privacy</a>
+          <a
+            href="https://github.com/philppplik/custm-tab/blob/main/extension/TECHNICAL.md"
+            >Technical docs</a
+          >
+          <a href="https://github.com/philppplik/custm-tab/issues">Report an issue</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script>
+      /**
+       * Scroll reveal.
+       *
+       * IntersectionObserver rather than a scroll listener: a scroll handler
+       * runs on every frame and janks on mobile. "Once" semantics come from
+       * unobserving after the first intersection.
+       */
+      (function () {
+        const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const targets = document.querySelectorAll('.reveal');
+
+        if (reduced || !('IntersectionObserver' in window)) {
+          targets.forEach((el) => el.classList.add('in'));
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              entry.target.classList.add('in');
+              observer.unobserve(entry.target);
+            }
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+        );
+
+        targets.forEach((el) => observer.observe(el));
+      })();
+    </script>
+  </body>
+</html>

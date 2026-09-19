@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Policy - cust*m Tab</title>
+    <meta
+      name="description"
+      content="cust*m Tab collects no user data. This policy explains exactly what is stored, where, and the three cases in which anything leaves your browser."
+    />
+    <link rel="icon" href="assets/custmTab-logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true">
+      <span class="a"></span>
+      <span class="b"></span>
+      <span class="c"></span>
+    </div>
+
+    <header class="nav">
+      <div class="shell">
+        <a class="brand" href="./">
+          <img src="assets/custmTab-logo.svg" alt="" />
+          cust*m Tab
+        </a>
+        <nav class="nav-links">
+          <a href="./">Home</a>
+          <a class="btn btn-ghost" href="https://github.com/philppplik/custm-tab"
+            >View source</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main class="shell doc">
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated 19 September 2026. Applies to cust*m Tab 1.2.1.</p>
+
+      <p>
+        <strong
+          >cust*m Tab does not collect, transmit, store or sell any user data.</strong
+        >
+        There is no account, no analytics, no telemetry, no crash reporting, no
+        advertising identifier, and no server operated by this project. Nothing about your
+        browsing is sent anywhere.
+      </p>
+      <p>
+        This document exists because the extension is not entirely offline: three features
+        send a request, and each happens only because you asked for it. They are listed
+        below in full.
+      </p>
+
+      <h2>What is stored, and where</h2>
+      <p>
+        Your settings live in your browser's own extension storage, on your device. They
+        are not readable by web pages and never leave the browser unless you turn on the
+        optional sync described below.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Stored</th>
+            <th>Where</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Bookmark tiles you created (name and URL)</td>
+            <td>Your device only. Never synced.</td>
+          </tr>
+          <tr>
+            <td>Chosen search engine, theme, background, icon mode</td>
+            <td>Your device. Synced only if you opt in.</td>
+          </tr>
+          <tr>
+            <td>Redirect URL, if you use redirect mode</td>
+            <td>Your device. Synced only if you opt in.</td>
+          </tr>
+          <tr>
+            <td>Your Pexels API key, if you supply one</td>
+            <td>
+              Your device only. <strong>Never synced</strong>, and removed from any
+              settings export.
+            </td>
+          </tr>
+          <tr>
+            <td>A cached page of Pexels photo URLs, if you use photo backgrounds</td>
+            <td>Your device only. Never synced.</td>
+          </tr>
+          <tr>
+            <td>Timestamps used to detect that the new tab was replaced</td>
+            <td>Your device only. Never synced.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>The three cases where something leaves your browser</h2>
+
+      <h3 style="margin-top: 32px; font-size: 1.1rem">1. You run a search</h3>
+      <p>
+        When you press Enter in the search bar, or use the <code>ct</code> keyword in the
+        address bar, your query goes to the search engine you selected, exactly as it
+        would if you had typed it into that engine yourself. Nothing is sent while you
+        type, and nothing is sent to this project. The default engines are DuckDuckGo and
+        Brave, which state that they do not build a profile of their users.
+      </p>
+
+      <h3 style="margin-top: 32px; font-size: 1.1rem">
+        2. You turn on photo backgrounds
+      </h3>
+      <p>
+        This feature is off by default and requires an API key that you obtain yourself
+        from Pexels. When it is on, the extension requests permission to reach
+        <code>api.pexels.com</code> and sends your search term and your key in order to
+        fetch photos. Your key is transmitted only in the request header, never in a URL,
+        and the request refuses to follow redirects so the key cannot be passed to another
+        host.
+      </p>
+      <p>
+        Pexels will see the request as coming from your key. Their handling of it is
+        governed by
+        <a href="https://www.pexels.com/privacy-policy/" rel="noopener"
+          >the Pexels privacy policy</a
+        >. Turning the feature off removes the host permission again.
+      </p>
+
+      <h3 style="margin-top: 32px; font-size: 1.1rem">
+        3. You choose the remote icon source
+      </h3>
+      <p>
+        Bookmark icons are resolved on your device by default, with locally drawn letter
+        tiles as the fallback. If you explicitly switch the icon source to DuckDuckGo in
+        Settings, the <em>hostname</em> of each bookmark is sent to
+        <code>icons.duckduckgo.com</code> to fetch an icon. The path, query string and
+        fragment of your bookmarks are never sent.
+      </p>
+      <p>
+        Versions before 1.2.0 sent every bookmark hostname to Google on every new tab.
+        That behaviour has been removed.
+      </p>
+
+      <h2>Optional sync</h2>
+      <p>
+        Sync is off by default. If you enable it, a limited set of preferences (mode,
+        redirect URL, search engine, icon mode, theme, background settings) is mirrored
+        through your browser's own sync service, operated by Google for Chrome or Mozilla
+        for Firefox, under their respective privacy policies. This project has no access
+        to it.
+      </p>
+      <p>
+        <strong>Your bookmarks and your API key are never synced.</strong> Bookmarks are
+        treated as belonging to the device; the API key is a credential, and sync leaves
+        the device.
+      </p>
+
+      <h2>Permissions, and why each one exists</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Permission</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>storage</code></td>
+            <td>Save your settings and bookmarks on your device.</td>
+          </tr>
+          <tr>
+            <td><code>alarms</code></td>
+            <td>
+              Run an hourly check for whether the browser silently reset the new-tab
+              override.
+            </td>
+          </tr>
+          <tr>
+            <td><code>notifications</code></td>
+            <td>Tell you when that check finds the override has been disabled.</td>
+          </tr>
+          <tr>
+            <td><code>favicon</code> (Chrome only)</td>
+            <td>
+              Read bookmark icons from the browser's own on-device cache, so no icon
+              request goes to a third party. Not present in the Firefox build.
+            </td>
+          </tr>
+          <tr>
+            <td><code>api.pexels.com</code> (optional)</td>
+            <td>
+              Requested only at the moment you enable photo backgrounds, and released when
+              you disable them. Never granted at install.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The extension requests no blanket host access and reads no page you visit. It
+        cannot see your browsing history, your tabs, your cookies or your form input.
+      </p>
+
+      <h2>Children</h2>
+      <p>
+        The extension collects no data from anyone, including children, and has no age
+        gate because there is nothing to gate.
+      </p>
+
+      <h2>Changes to this policy</h2>
+      <p>
+        If the extension's data handling ever changes, this page changes with it in the
+        same release, and the change is recorded in the
+        <a
+          href="https://github.com/philppplik/custm-tab/blob/main/CHANGELOG.md"
+          rel="noopener"
+          >changelog</a
+        >. The full source is public, so any claim here can be checked against the code.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions or corrections:
+        <a href="https://github.com/philppplik/custm-tab/issues" rel="noopener"
+          >open an issue</a
+        >. For anything security-sensitive, please use
+        <a
+          href="https://github.com/philppplik/custm-tab/security/advisories/new"
+          rel="noopener"
+          >private vulnerability reporting</a
+        >
+        rather than a public issue.
+      </p>
+    </main>
+
+    <footer class="foot">
+      <div class="shell">
+        <p>MIT licensed. Built in the open.</p>
+        <nav>
+          <a href="./">Home</a>
+          <a href="https://github.com/philppplik/custm-tab">GitHub</a>
+          <a href="https://github.com/philppplik/custm-tab/blob/main/SECURITY.md"
+            >Security</a
+          >
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -198,6 +198,21 @@
     pexelsDenied: 'Permission to reach api.pexels.com was declined.',
   };
 
+  /**
+   * Paint the chosen background on the settings page itself.
+   *
+   * Without this the page showed one background while the picker claimed
+   * another, which reads as a bug. Photo mode is previewed as its gradient
+   * fallback rather than spending an API request on a settings visit.
+   */
+  function previewBackground() {
+    backgrounds.apply(
+      document,
+      bg.type === 'photo' ? { ...bg, type: 'gradient' } : bg,
+      null
+    );
+  }
+
   function showBgPanels() {
     $('bg-gradient-settings').hidden = bg.type !== 'gradient';
     $('bg-color-settings').hidden = bg.type !== 'color';
@@ -232,6 +247,7 @@
             click: () => {
               bg = { ...bg, gradient: id };
               renderGradients();
+              previewBackground();
             },
           },
         })
@@ -270,6 +286,7 @@
               $('bg-color-hex').value = hex;
               renderSwatches();
               describeContrast();
+              previewBackground();
             },
           },
         })
@@ -300,6 +317,7 @@
         if (type !== 'photo') await pexels.dropPermission();
         bg = { ...bg, type };
         showBgPanels();
+        previewBackground();
       });
     });
 
@@ -343,6 +361,7 @@
     renderSwatches();
     describeContrast();
     syncRangeLabels();
+    previewBackground();
   }
 
   function setPexelsStatus(message, ok) {

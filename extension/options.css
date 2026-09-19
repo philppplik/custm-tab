@@ -436,3 +436,37 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Link styling ───────────────────────────────────
+   Inline links were inheriting the browser default blue, which clashes with
+   every other colour on the page and reads as unstyled. */
+.ct-page a {
+  color: var(--ct-text);
+  text-decoration: none;
+  border-bottom: 1px solid rgb(255 255 255 / 0.35);
+  transition: border-color 0.18s;
+}
+.ct-page a:hover,
+.ct-page a:focus-visible {
+  border-bottom-color: var(--ct-text);
+}
+:root[data-theme='light'] .ct-page a {
+  border-bottom-color: rgb(27 19 43 / 0.35);
+}
+
+/* Breathing room between a wrapped hint and the control that follows it. */
+.sub-settings .field__hint + .field {
+  margin-top: 18px;
+}
+.sub-settings > .field__hint {
+  margin-bottom: 20px;
+}
+.sub-settings .field + .field {
+  margin-top: 16px;
+}
+
+/* Inside the two-column row the fields are siblings in a grid, so the
+   stacking margin above would knock the second column out of alignment. */
+.field-row .field + .field {
+  margin-top: 0;
+}

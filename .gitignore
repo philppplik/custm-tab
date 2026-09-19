@@ -19,3 +19,6 @@ coverage/
 # Editor
 .vscode/
 .idea/
+
+# Playwright MCP scratch output (page snapshots, console logs)
+.playwright-mcp/
