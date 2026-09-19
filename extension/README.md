@@ -22,17 +22,24 @@ Switch at any time in Settings.
 
 ## Features
 
-- **Backgrounds** - six gradient palettes, any solid colour, or a Pexels photo.
-  A flat colour drives its own text contrast from WCAG relative luminance, so a
-  pale choice stays readable.
+- **Backgrounds** - six gradient palettes, any solid colour, a Pexels photo, or
+  your own picture from disk. A flat colour drives its own text contrast from
+  WCAG relative luminance, so a pale choice stays readable.
+- **Interface material** - glass, frosted, or solid. Solid turns off every
+  backdrop filter, which is the fastest option on older hardware, and picks its
+  own light or dark tone.
+- **A clock and greeting you own** - shown or hidden, 12- or 24-hour, optional
+  seconds, size, weight and typeface. The greeting is the time of day with your
+  name, your own headline instead, or nothing at all.
 - **Sunrise reveal** - the background rises and blooms as the tab opens, on the
   compositor. Suppressed under `prefers-reduced-motion`.
 - **26 search engines** - five curated in the dashboard picker, all of them in
-  Settings, each with an honest privacy badge.
+  Settings, each with an honest privacy badge and a vendored brand mark.
 - **Omnibox** - type `ct` in the address bar; `ct brave cats` forces an engine.
 - **Bookmarks** - add, edit, delete and drag to reorder directly on the tab.
 - **Private by default** - icons resolve on-device, with locally drawn letter
-  tiles as the fallback. The remote icon source is opt-in.
+  tiles as the fallback. Every source that touches the network is opt-in, and
+  says what it discloses and to whom.
 - **Opt-in sync** - preferences only. Bookmarks and the Pexels key never leave
   the device.
 - **Persistence monitor** - an hourly alarm warns if the browser silently drops
@@ -58,7 +65,9 @@ extension/
 ├── compat.js            CUSTM_API: browser ?? chrome. Load first on every page.
 ├── url.js               CUSTM_URL: protocol allowlist and normalisation.
 ├── dom.js               CUSTM_DOM: safe element construction, never innerHTML.
-├── favicon.js           CUSTM_FAVICON: on-device, monogram, or opt-in remote.
+├── icons.js             CUSTM_ICONS: vendored brand glyphs. GENERATED.
+├── favicon.js           CUSTM_FAVICON: on-device, site, monogram, or remote.
+├── appearance.js        CUSTM_APPEARANCE: surface material, clock, greeting.
 ├── backgrounds.js       CUSTM_BACKGROUND: palettes, contrast, sunrise reveal.
 ├── pexels.js            CUSTM_PEXELS: BYO-key client with local page caching.
 ├── search-engines.js    Engine registry, also loaded by the background context.
@@ -74,15 +83,29 @@ extension/
 ```
 
 **Load order matters.** `compat.js` defines `CUSTM_API`, which `store.js` reads
-at evaluation time, and `dom.js` consults `CUSTM_URL` when setting `href` or
-`src`. `tests/newtab.integration.test.js` asserts the order declared in
-`newtab.html` actually satisfies those dependencies.
+at evaluation time; `dom.js` consults `CUSTM_URL` when setting `href` or `src`;
+`icons.js` calls `CUSTM_DOM.svg`; and `store.js` normalises through
+`CUSTM_APPEARANCE`, `CUSTM_BACKGROUND` and `CUSTM_FAVICON` on every read.
+`tests/newtab.integration.test.js` and `tests/options.markup.test.js` assert the
+declared order actually satisfies those dependencies.
 
 ## Adding a search engine
 
 `search-engines.js` is the single source of truth. Append one object to
 `ENGINES` with a `{query}` placeholder in `url`; nothing else needs changing.
 Set `privacy` honestly: `low` means that provider builds a profile.
+
+To give it a brand mark, add the engine id to `MAP` in
+`scripts/generate-icons.mjs` and run `npm run generate:icons`. Engines with no
+published mark fall through to a neutral glyph on purpose — drawing a brand
+badly is worse than not drawing it.
+
+## Why the icons are vendored
+
+`icons.js` is generated and committed. Requesting glyphs from an icon CDN at
+runtime would tell that CDN how often you open a tab, which is exactly the
+Google favicon beacon removed in 1.2.0 wearing a different hat. The generator
+runs once, offline; the shipped add-on requests no icon from anybody.
 
 ## Cross-browser
 

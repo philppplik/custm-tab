@@ -1,6 +1,6 @@
 {
   "name": "custm-tab",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "private": true,
   "description": "cust*m Tab — Your tab. Your rules. A privacy-first, fully customisable new-tab extension for Chrome and Firefox.",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "validate:manifest": "node scripts/validate-manifest.mjs",
+    "generate:icons": "node scripts/generate-icons.mjs",
     "build": "node scripts/build.mjs",
     "lint:ext": "npm run build && web-ext lint --source-dir dist/firefox --warnings-as-errors",
     "screenshots": "node tools/preview/server.mjs",

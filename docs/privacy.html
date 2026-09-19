@@ -6,7 +6,7 @@
     <title>Privacy Policy - cust*m Tab</title>
     <meta
       name="description"
-      content="cust*m Tab collects no user data. This policy explains exactly what is stored, where, and the three cases in which anything leaves your browser."
+      content="cust*m Tab collects no user data. This policy explains exactly what is stored, where, and the four cases in which anything leaves your browser."
     />
     <link rel="icon" href="assets/custmTab-logo.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="style.css" />
@@ -35,7 +35,7 @@
 
     <main class="shell doc">
       <h1>Privacy Policy</h1>
-      <p class="updated">Last updated 19 September 2026. Applies to cust*m Tab 1.2.1.</p>
+      <p class="updated">Last updated 19 September 2026. Applies to cust*m Tab 1.3.0.</p>
 
       <p>
         <strong
@@ -46,7 +46,7 @@
         browsing is sent anywhere.
       </p>
       <p>
-        This document exists because the extension is not entirely offline: three features
+        This document exists because the extension is not entirely offline: four features
         send a request, and each happens only because you asked for it. They are listed
         below in full.
       </p>
@@ -90,13 +90,29 @@
             <td>Your device only. Never synced.</td>
           </tr>
           <tr>
+            <td>A background picture you chose from your own disk</td>
+            <td>
+              Your device only. <strong>Never uploaded and never synced</strong>, and
+              removed from any settings export. It is re-encoded when you choose it, which
+              discards embedded EXIF metadata such as the GPS coordinates a phone records
+              in a photo.
+            </td>
+          </tr>
+          <tr>
+            <td>Clock, greeting and interface preferences, including a name you enter</td>
+            <td>
+              Your device. Synced only if you opt in. A name entered for the greeting is
+              only ever displayed on your own new tab.
+            </td>
+          </tr>
+          <tr>
             <td>Timestamps used to detect that the new tab was replaced</td>
             <td>Your device only. Never synced.</td>
           </tr>
         </tbody>
       </table>
 
-      <h2>The three cases where something leaves your browser</h2>
+      <h2>The four cases where something leaves your browser</h2>
 
       <h3 style="margin-top: 32px; font-size: 1.1rem">1. You run a search</h3>
       <p>
@@ -141,18 +157,33 @@
         That behaviour has been removed.
       </p>
 
+      <h3 style="margin-top: 32px; font-size: 1.1rem">
+        4. You choose to load icons from each site directly
+      </h3>
+      <p>
+        This icon source is also off by default. When you select it, your browser requests
+        <code>/favicon.ico</code> from each bookmarked site itself. No third party is
+        involved and nothing is sent to this project — but those sites do see a request,
+        which tells each of them that you opened a new tab. The setting says so where you
+        choose it, so the trade is yours to make rather than ours to make quietly.
+      </p>
+
       <h2>Optional sync</h2>
       <p>
         Sync is off by default. If you enable it, a limited set of preferences (mode,
-        redirect URL, search engine, icon mode, theme, background settings) is mirrored
-        through your browser's own sync service, operated by Google for Chrome or Mozilla
-        for Firefox, under their respective privacy policies. This project has no access
-        to it.
+        redirect URL, search engine, icon mode, theme, interface and background settings)
+        is mirrored through your browser's own sync service, operated by Google for Chrome
+        or Mozilla for Firefox, under their respective privacy policies. This project has
+        no access to it.
       </p>
       <p>
-        <strong>Your bookmarks and your API key are never synced.</strong> Bookmarks are
-        treated as belonging to the device; the API key is a credential, and sync leaves
-        the device.
+        <strong
+          >Your bookmarks, your API key and your own background picture are never
+          synced.</strong
+        >
+        Bookmarks are treated as belonging to the device, the API key is a credential and
+        sync leaves the device, and a picture from your disk is both personal and far
+        larger than the sync quota allows.
       </p>
 
       <h2>Permissions, and why each one exists</h2>

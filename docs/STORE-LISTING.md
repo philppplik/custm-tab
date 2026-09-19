@@ -7,7 +7,7 @@ Kept in the repository so the listing stays in step with the code it describes.
 
 ## Package
 
-Upload `dist/custm-tab-chrome-1.2.0.zip` (built by `npm run build`).
+Upload `dist/custm-tab-chrome-1.3.0.zip` (built by `npm run build`).
 
 Do **not** upload the Firefox package to Chrome: it carries `background.scripts`
 instead of `background.service_worker` and omits the `favicon` permission.
@@ -18,7 +18,7 @@ instead of `background.service_worker` and omits the `favicon` permission.
 
 ### Description
 
-> Limit 16,000 characters. This is roughly 2,050.
+> Limit 16,000 characters. This is roughly 2,800.
 
 ```
 Your tab. Your rules.
@@ -35,7 +35,9 @@ WHAT YOU GET
 
 • Omnibox search. Type "ct" in the address bar followed by your query to search without opening a tab at all. Type "ct brave cats" to force a specific engine for one search.
 
-• Backgrounds you choose. Six gradient palettes, any solid colour you like via a picker, or a photo from Pexels. Pick a flat colour and the interface works out its own contrast from that colour's luminance, so a pale background gets dark text automatically instead of being forbidden.
+• Backgrounds you choose. Six gradient palettes, any solid colour you like via a picker, a photo from Pexels, or your own picture from your disk. Pick a flat colour and the interface works out its own contrast from that colour's luminance, so a pale background gets dark text automatically instead of being forbidden.
+
+• An interface you shape. Choose the material the whole interface is made of - glass, frosted, or solid with no blur at all, which is the fastest option on older hardware. Then decide what is even on the page: show the clock or hide it, 12-hour or 24-hour, with or without seconds, at the size, weight and typeface you want. The greeting can say the time of day with your name in it, your own headline instead, or nothing whatsoever. Turn all of it off and your tab is a search bar over a background, which is a perfectly good answer.
 
 • Photo backgrounds on your own key. Supply a free Pexels API key, set a search term, and get a new photo every day, every hour, or on every new tab. The photographer is always credited with a link back.
 
@@ -49,13 +51,16 @@ ABOUT YOUR PRIVACY
 
 Everything is stored in your browser's own extension storage, on your device.
 
-Three things leave your browser, and each one only because you asked:
+Four things can leave your browser, and each one only because you asked:
 
 1. A search query goes to the engine you picked, when you press Enter. Never while you type.
 2. If you turn on photo backgrounds, a request goes to Pexels using the API key you supplied. Permission to reach that host is requested at that moment and released when you turn the feature off.
 3. If you explicitly switch the bookmark icon source to DuckDuckGo, the hostname of each bookmark is sent there to fetch an icon. Paths and query strings never are.
+4. If you instead choose to load icons from each site directly, your browser asks each bookmarked site for its own icon. No third party is involved, but those sites do see the request.
 
 By default, bookmark icons are resolved from your browser's own on-device cache, with locally drawn letter tiles as the fallback. Nothing is fetched from a third party.
+
+A background picture you choose from your own disk never leaves the device either. It is re-encoded when you pick it, which discards EXIF metadata such as the GPS coordinates a phone writes into a photo.
 
 Earlier versions requested every bookmark icon from Google on every new tab. That behaviour has been removed.
 
@@ -199,6 +204,18 @@ Tick **none** of the nine categories:
 > created by hand. That is user-authored configuration, not a record of pages
 > visited. The extension has no `history` and no `tabs` permission, and cannot
 > observe navigation.
+
+> **On "Personally identifiable information" specifically:** Settings offers an
+> optional name field, used solely to render "Good evening, &lt;name&gt;" on the
+> user's own new tab. It is held in extension storage, is included in the
+> opt-in browser sync the user controls, and is never transmitted to this
+> project or to anybody else. Chrome's categories concern collection — meaning
+> transmission off the device — and nothing here is collected.
+
+> **On a background picture chosen from disk:** it is held in extension storage
+> on the device, excluded from sync and from settings exports, and re-encoded
+> through a canvas on import, which discards EXIF metadata including GPS
+> coordinates. It never leaves the device.
 
 Certify all three disclosures as **true**:
 
