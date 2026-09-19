@@ -1,0 +1,92 @@
+name: Bug report
+description: Something in cust*m Tab behaves incorrectly.
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a report. Please do **not** paste an
+        API key, access token, or any other secret into this issue.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did you get instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Edge
+        - Brave
+        - Firefox
+        - Other Chromium-based
+    validations:
+      required: true
+
+  - type: input
+    id: browser-version
+    attributes:
+      label: Browser version
+      placeholder: 'e.g. 131.0.6778.86'
+    validations:
+      required: true
+
+  - type: input
+    id: extension-version
+    attributes:
+      label: cust*m Tab version
+      description: Shown on the extensions page, or in `manifest.json`.
+      placeholder: 'e.g. 1.2.0'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area?
+      options:
+        - New tab dashboard
+        - Backgrounds (gradient / colour / Pexels)
+        - Settings page
+        - Onboarding wizard
+        - Omnibox search
+        - Sync
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      description: >
+        Open DevTools on the new tab (or `chrome://extensions` -> service worker)
+        and paste any errors. This is automatically formatted as code.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: This report contains no API keys, tokens, or personal data.
+          required: true

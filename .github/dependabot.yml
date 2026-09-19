@@ -1,0 +1,41 @@
+version: 2
+
+updates:
+  # ── Repo tooling (ESLint, Prettier, Vitest, web-ext) ──
+  # The shipped extension has zero runtime dependencies, so everything here is
+  # dev-only. Grouped so routine bumps arrive as one reviewable PR per week.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      dev-tooling:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+
+  # ── GitHub Actions ──
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - ci
+    commit-message:
+      prefix: ci

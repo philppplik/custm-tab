@@ -1,0 +1,9 @@
+# Default owner for everything in the repository.
+* @philppplik
+
+# Anything that touches permissions, the service worker, or CI deserves a
+# deliberate second look even when the owner is the author.
+/extension/manifest.json  @philppplik
+/extension/background.js  @philppplik
+/.github/                 @philppplik
+/scripts/                 @philppplik
