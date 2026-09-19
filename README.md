@@ -41,9 +41,15 @@ profile of you. Type `ct` in the address bar to search without opening a tab;
 `ct brave cats` forces a specific engine for one query.
 
 **Backgrounds you choose.** Six gradient palettes, any solid colour via a
-picker, or a photo from Pexels. Pick a flat colour and the interface derives its
-own text contrast from that colour's WCAG luminance, so a pale background gets
-dark text rather than being disallowed.
+picker, a photo from Pexels, or your own picture from disk. Pick a flat colour
+and the interface derives its own text contrast from that colour's WCAG
+luminance, so a pale background gets dark text rather than being disallowed.
+
+**An interface you shape.** Glass, frosted or solid material. A clock you can
+resize, reweight, restyle or switch off. A greeting that says the time of day
+with your name, your own headline instead, or nothing. Turn all of it off and
+the tab is a search bar over a background — which is a legitimate answer, so it
+is one you can pick.
 
 **Photo backgrounds on your own key.** Set a search term and get a new photo
 every day, every hour, or on every tab. The photographer is always credited.
@@ -61,7 +67,7 @@ your API key never leave the device.
 
 ## Privacy
 
-The extension collects nothing. Three things leave your browser, each only
+The extension collects nothing. Four things can leave your browser, each only
 because you asked:
 
 | When                                 | What is sent                          | To                      |
@@ -69,6 +75,7 @@ because you asked:
 | You press Enter in the search bar    | Your query                            | The engine you selected |
 | You enable photo backgrounds         | Your search term and your own API key | `api.pexels.com`        |
 | You switch the icon source to remote | Each bookmark's hostname              | `icons.duckduckgo.com`  |
+| You switch the icon source to sites  | A request for `/favicon.ico`          | Each bookmarked site    |
 
 By default, bookmark icons resolve from the browser's own on-device cache, with
 locally drawn letter tiles as the fallback.
@@ -103,14 +110,15 @@ npm install
 npm run verify
 ```
 
-| Command                 | What it does                                                 |
-| ----------------------- | ------------------------------------------------------------ |
-| `npm run verify`        | Everything CI runs: format, lint, manifest validation, tests |
-| `npm test`              | Unit and integration tests                                   |
-| `npm run test:coverage` | Tests plus coverage thresholds                               |
-| `npm run build`         | Per-browser packages into `dist/`                            |
-| `npm run lint:ext`      | `web-ext lint` against the Firefox package                   |
-| `npm run screenshots`   | Serve the preview harness to regenerate store assets         |
+| Command                  | What it does                                                 |
+| ------------------------ | ------------------------------------------------------------ |
+| `npm run verify`         | Everything CI runs: format, lint, manifest validation, tests |
+| `npm test`               | Unit and integration tests                                   |
+| `npm run test:coverage`  | Tests plus coverage thresholds                               |
+| `npm run build`          | Per-browser packages into `dist/`                            |
+| `npm run lint:ext`       | `web-ext lint` against the Firefox package                   |
+| `npm run screenshots`    | Serve the preview harness to regenerate store assets         |
+| `npm run generate:icons` | Re-vendor the search engine brand glyphs (needs network)     |
 
 `extension/` loads unpacked in both browsers as-is. The Node tooling lints,
 tests and packages; it never compiles the source.

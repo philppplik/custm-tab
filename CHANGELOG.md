@@ -7,6 +7,69 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-19
+
+### Fixed
+
+- **Bookmark icons had stopped appearing.** Two independent causes, either of
+  which reproduces the symptom on its own. Chrome's `_favicon/` cache answers
+  _every_ request with HTTP 200, returning a generic placeholder when it has
+  nothing stored — so an `<img>` never fired `error`, the monogram fallback
+  never ran, and the grid filled with identical grey glyphs. And the lookup
+  passed a bare origin (`https://example.com`) while Chrome keys its favicon
+  database on page URLs (`https://example.com/`); the trailing slash is not
+  cosmetic. Icons are now verified against a sample of that placeholder and
+  fall back to a letter tile when they turn out to be it.
+- **The search engine menu opened behind the bookmark tiles.** It already
+  carried `z-index: 100`, but z-index only compares inside one stacking
+  context, and `.search-shell` creates its own the moment it is focused —
+  which is exactly what clicking the engine button does. The three dashboard
+  rows now declare their order explicitly. The menu was also translucent
+  enough that the tiles behind it stayed legible, which reads as "underneath"
+  regardless of paint order; it now uses a proper menu material.
+- **Radio groups on the settings page showed no selection.** `.theme-chip`
+  became the shared style for four separate groups, and the theme handler
+  selected on the class alone, stripping the active state off the other three.
+- **Privacy badges were unreadable on a light menu** — pale green on a pale
+  green tint is about 1.6:1, and these badges are the one place the product
+  makes a factual claim about a search provider.
+
+### Added
+
+- **An Interface section in Settings**, on the premise that the parts a new-tab
+  page normally hard-codes should be yours:
+  - **Material** — glass, frosted, or solid. Solid turns off every backdrop
+    filter, which is the fastest option on older hardware, and picks its own
+    light or dark tone.
+  - **Clock** — shown or not, 12- or 24-hour or follow-your-language, optional
+    seconds, size from 50% to 250%, weight from 100 to 800, and four typefaces.
+  - **Greeting** — the time-of-day line with your name (“Good evening,
+    Philipp”), your own headline in place of it, or nothing at all. Turn the
+    clock and date off too and the tab is just your line and a search bar.
+  - **Date** — shown or not.
+- **Your own background image**, chosen from disk. Re-encoded through a canvas
+  on import, which drops EXIF — including the GPS coordinates a phone writes
+  into every photo — and brings a 12-megapixel file inside the storage quota. A
+  5 MB PNG lands at about 43 KB. Never uploaded, never synced, and left out of
+  settings exports.
+- **A fourth bookmark icon source: from each site directly.** No third party is
+  involved; the trade is that each bookmarked site learns when you open a tab,
+  which the setting says plainly.
+
+### Changed
+
+- **Search engines now carry real brand marks instead of emoji.** The path data
+  is vendored into the extension at build time by `npm run generate:icons`, so
+  the shipped add-on still makes no icon request to anybody — an icon CDN would
+  have reintroduced the beacon removed in 1.2.0. Marks are monochrome and
+  inherit the text colour, so one glyph works on light, dark and photo
+  backgrounds alike.
+- **The settings page now wears the background you configured**, including your
+  own image. A Pexels photo is still previewed as its gradient fallback rather
+  than spending one of your API requests on a settings visit.
+- The preview harness no longer serves stale stylesheets, which made a working
+  fix look broken.
+
 ## [1.2.1] - 2026-09-19
 
 ### Fixed
