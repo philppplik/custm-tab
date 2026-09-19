@@ -1,0 +1,20 @@
+# Normalise every text file to LF in the repository.
+#
+# Prettier is configured with `endOfLine: "lf"` and CI runs `format:check` on
+# Linux. Without this, a Windows checkout commits CRLF and the check fails for
+# reasons that have nothing to do with the change under review.
+* text=auto eol=lf
+
+# Binary assets must never be touched.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.zip binary
+*.woff binary
+*.woff2 binary
+
+# Keep generated lockfiles out of diff review noise.
+package-lock.json -diff linguist-generated=true
