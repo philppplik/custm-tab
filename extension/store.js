@@ -37,7 +37,7 @@
       { name: 'YouTube', url: 'https://youtube.com' },
     ],
     searchEngine: 'duckduckgo', // engine id from search-engines.js
-    iconMode: 'local', // 'local' | 'monogram' | 'remote' — see favicon.js
+    iconMode: 'local', // 'local' | 'site' | 'monogram' | 'remote' — favicon.js
 
     // ── Behaviour ──
     maskUrl: true, // redirect: embed in an iframe to hide the address
@@ -45,15 +45,41 @@
     // ── Appearance ──
     theme: 'auto', // 'auto' | 'light' | 'dark'
 
-    // Background: gradient palette, flat colour, or a Pexels photo.
-    // See backgrounds.js for the shape and the contrast rules.
+    // Surface material and the typography of the clock and greeting.
+    // See appearance.js — this is the "your tab, your rules" surface area.
+    appearance: {
+      surface: 'glass', // 'glass' | 'frosted' | 'solid'
+      solidTone: 'dark', // 'dark' | 'light', used when surface is 'solid'
+      clock: {
+        show: true,
+        seconds: false,
+        format: 'auto', // 'auto' | '12' | '24'
+        size: 1, // multiplier on the stylesheet's base size
+        weight: 200, // 100-800
+        font: 'system', // 'system' | 'rounded' | 'serif' | 'mono'
+      },
+      date: { show: true },
+      greeting: {
+        mode: 'time', // 'time' | 'text' | 'none'
+        name: '', // appended to the time-of-day greeting
+        text: 'cust*m Tab', // used when mode is 'text'
+      },
+    },
+
+    // Background: gradient palette, flat colour, a Pexels photo, or the
+    // user's own picture. See backgrounds.js for the shape and contrast rules.
     background: {
-      type: 'gradient', // 'gradient' | 'color' | 'photo'
+      type: 'gradient', // 'gradient' | 'color' | 'photo' | 'image'
       gradient: 'aurora',
       color: '#180646',
-      overlay: 0.35, // scrim over a photo, 0-0.8
-      blur: 0, // photo blur in px, 0-24
+      overlay: 0.35, // scrim over a picture, 0-0.8
+      blur: 0, // picture blur in px, 0-24
     },
+
+    // The user's own background picture, as a data URL. Device-local: it is
+    // far too large for the 100KB storage.sync quota, and it is a file from
+    // their disk, which is not something to copy to another machine silently.
+    backgroundImage: '',
 
     // Sunrise reveal on page load. Decorative, and suppressed automatically
     // under prefers-reduced-motion.
@@ -96,6 +122,7 @@
     'iconMode',
     'maskUrl',
     'theme',
+    'appearance',
     'background',
     'sunrise',
     'pexels',
@@ -105,10 +132,15 @@
   /**
    * Keys that must never leave this device, even though they are settings.
    *
-   * `pexelsApiKey` is a credential. `pexelsCache` is a large, device-local
-   * blob that would burn the 100KB storage.sync quota for no benefit.
+   * `pexelsApiKey` is a credential. `pexelsCache` and `backgroundImage` are
+   * large, device-local blobs that would burn the 100KB storage.sync quota —
+   * a single background picture exceeds the entire quota on its own.
    */
-  const NEVER_SYNC_KEYS = Object.freeze(['pexelsApiKey', 'pexelsCache']);
+  const NEVER_SYNC_KEYS = Object.freeze([
+    'pexelsApiKey',
+    'pexelsCache',
+    'backgroundImage',
+  ]);
 
   const KEYS = Object.freeze(Object.keys(DEFAULTS));
 
@@ -158,20 +190,31 @@
   function normalize(settings) {
     settings.mode = oneOf(settings.mode, ['dashboard', 'redirect'], 'dashboard');
     settings.theme = oneOf(settings.theme, ['auto', 'light', 'dark'], 'auto');
-    settings.iconMode = oneOf(
-      settings.iconMode,
-      ['local', 'monogram', 'remote'],
-      'local'
-    );
+    settings.iconMode = global.CUSTM_FAVICON
+      ? global.CUSTM_FAVICON.normalizeMode(settings.iconMode)
+      : 'local';
     settings.bookmarks = normalizeBookmarks(settings.bookmarks);
     settings.maskUrl = settings.maskUrl !== false;
     settings.sunrise = settings.sunrise !== false;
     settings.syncEnabled = settings.syncEnabled === true;
     settings.targetUrl = typeof settings.targetUrl === 'string' ? settings.targetUrl : '';
 
+    settings.appearance = global.CUSTM_APPEARANCE
+      ? global.CUSTM_APPEARANCE.normalize(settings.appearance)
+      : settings.appearance;
+
     settings.background = global.CUSTM_BACKGROUND
       ? global.CUSTM_BACKGROUND.normalize(settings.background)
       : settings.background;
+
+    // Anything that is not one of the three raster data URLs this app writes
+    // is discarded outright. It would otherwise be interpolated into a CSS
+    // url() on a privileged extension origin.
+    settings.backgroundImage =
+      global.CUSTM_BACKGROUND &&
+      global.CUSTM_BACKGROUND.isImageData(settings.backgroundImage)
+        ? settings.backgroundImage
+        : '';
 
     const pexels =
       settings.pexels && typeof settings.pexels === 'object' ? settings.pexels : {};
