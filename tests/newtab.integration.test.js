@@ -11,18 +11,33 @@ import { loadScripts, readExtensionFile } from './helpers/load-script.js';
  * a user's first tab.
  */
 
-/** Script order as declared by newtab.html, extracted from the file itself. */
-function scriptOrder() {
-  const html = readExtensionFile('newtab.html');
-  return [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1]);
+/**
+ * Parse newtab.html with a real HTML parser.
+ *
+ * Deliberately not regex: a pattern like `/<script.*?<\/script>/` misses
+ * `<SCRIPT>` and `</script >`, which is precisely the class of bug that makes
+ * regex-based tag filtering unsafe. Using DOMParser means the test reads the
+ * page the way a browser does.
+ */
+function parsePage() {
+  return new DOMParser().parseFromString(readExtensionFile('newtab.html'), 'text/html');
 }
 
-/** Install the page body into the test document. */
+/** Script order as declared by newtab.html, read from the parsed document. */
+function scriptOrder() {
+  return [...parsePage().querySelectorAll('script[src]')].map((el) =>
+    el.getAttribute('src')
+  );
+}
+
+/** Install the page body into the test document, minus its script tags. */
 function mountPage() {
-  const html = readExtensionFile('newtab.html');
-  const body = /<body>([\s\S]*)<\/body>/.exec(html)[1];
-  // Strip the script tags; they are evaluated explicitly afterwards.
-  document.body.innerHTML = body.replace(/<script[\s\S]*?<\/script>/g, '');
+  const doc = parsePage();
+  // The scripts are evaluated explicitly afterwards, in declared order.
+  doc.querySelectorAll('script').forEach((el) => el.remove());
+  document.body.replaceChildren(
+    ...[...doc.body.childNodes].map((node) => document.importNode(node, true))
+  );
 }
 
 /** Let the page's async boot IIFE settle. */
