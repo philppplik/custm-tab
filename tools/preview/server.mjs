@@ -38,6 +38,11 @@ createServer(async (req, res) => {
     const body = await readFile(target);
     res.writeHead(200, {
       'content-type': TYPES[extname(target)] || 'application/octet-stream',
+      // Without this the browser applies heuristic caching to a response that
+      // carries no freshness header, and keeps serving the stylesheet from
+      // before the edit. A harness that shows stale CSS is worse than no
+      // harness: it makes a fix that worked look like it did not.
+      'cache-control': 'no-store',
     });
     res.end(body);
   } catch {
