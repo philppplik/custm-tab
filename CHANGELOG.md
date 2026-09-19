@@ -7,6 +7,37 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-09-19
+
+### Fixed
+
+- **Solid light backgrounds were unreadable in three places.** Adding pale
+  colours in 1.2.0 exposed elements that had only ever been styled against the
+  dark gradient: the white logo vanished, bookmark labels kept a black glow that
+  read as dirt under dark text, and the add tile lost its dashed outline. Each
+  now has an explicit light-theme counterpart. Found by rendering the real UI
+  rather than by reading the CSS.
+- **The settings page contradicted its own picker.** Selecting a palette showed
+  it as active while the page kept the previous background. The background is
+  now previewed live as you choose it, which is also what makes picking a solid
+  colour there worth doing.
+- **Inline links in Settings used the browser default blue**, which clashed with
+  every other colour on the page, and the Pexels hint paragraph collided with the
+  Darken slider label below it.
+
+### Added
+
+- A landing page at <https://philppplik.github.io/custm-tab/>, built from the
+  same design tokens as the extension, with the privacy policy the stores
+  require at `/privacy.html`.
+- `screenshots/` with five 1280x800 store screenshots and both Chrome promo
+  tiles, captured from the real UI rather than drawn separately.
+- `tools/preview/` - a harness that renders the actual extension pages outside
+  an extension context, so store assets cannot drift from the product. Run it
+  with `npm run screenshots`.
+- `docs/STORE-LISTING.md` with the exact copy for every Chrome Web Store field,
+  version-controlled next to the code it describes.
+
 ## [1.2.0] - 2026-09-19
 
 ### Added
@@ -159,7 +190,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Hourly persistence monitor that warns when the new-tab override appears to
   have been disabled.
 
-[Unreleased]: https://github.com/philppplik/custm-tab/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/philppplik/custm-tab/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/philppplik/custm-tab/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/philppplik/custm-tab/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/philppplik/custm-tab/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/philppplik/custm-tab/releases/tag/v1.0.0

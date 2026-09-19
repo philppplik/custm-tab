@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>cust*m Tab promo tiles</title>
+    <style>
+      /*
+       * Chrome Web Store promo tiles.
+       *
+       * Rendered at the exact canvas sizes the store requires and captured as
+       * JPEG, because the store rejects PNGs carrying an alpha channel.
+       *
+       * The palette is the product's own Aurora gradient, so the tile and the
+       * extension read as the same thing.
+       */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #000;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+          sans-serif;
+      }
+
+      .tile {
+        position: relative;
+        overflow: hidden;
+        background: #180646;
+        display: flex;
+        align-items: center;
+      }
+      .tile[data-size='small'] {
+        width: 440px;
+        height: 280px;
+        padding: 0 34px;
+      }
+      .tile[data-size='marquee'] {
+        width: 1400px;
+        height: 560px;
+        padding: 0 110px;
+      }
+
+      /* The three ambient blobs, same construction as the new tab itself. */
+      .blob {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        border-radius: 50%;
+        filter: blur(60px);
+      }
+      .tile[data-size='marquee'] .blob {
+        filter: blur(150px);
+      }
+      .b1 {
+        width: 120%;
+        aspect-ratio: 1;
+        background: #29058e;
+        transform: translate(-50%, 50%);
+      }
+      .b2 {
+        width: 105%;
+        aspect-ratio: 1.12;
+        background: #ff3300;
+        opacity: 0.58;
+        transform: translate(-50%, 56%);
+      }
+      .b3 {
+        width: 88%;
+        aspect-ratio: 1.28;
+        background: #edd30f;
+        opacity: 0.42;
+        transform: translate(-50%, 62%);
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+      .tile[data-size='small'] .content {
+        gap: 18px;
+      }
+      .tile[data-size='marquee'] .content {
+        gap: 54px;
+      }
+
+      .mark {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        background: rgb(255 255 255 / 0.1);
+        border: 1px solid rgb(255 255 255 / 0.28);
+        box-shadow:
+          inset 0 1px 0 rgb(255 255 255 / 0.3),
+          0 18px 50px rgb(0 0 0 / 0.4);
+      }
+      .tile[data-size='small'] .mark {
+        width: 76px;
+        height: 76px;
+        border-radius: 20px;
+      }
+      .tile[data-size='marquee'] .mark {
+        width: 176px;
+        height: 176px;
+        border-radius: 44px;
+      }
+      .mark img {
+        display: block;
+      }
+      .tile[data-size='small'] .mark img {
+        width: 44px;
+      }
+      .tile[data-size='marquee'] .mark img {
+        width: 104px;
+      }
+
+      .wordmark {
+        color: #fff;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+      }
+      .tile[data-size='small'] .wordmark {
+        font-size: 38px;
+      }
+      .tile[data-size='marquee'] .wordmark {
+        font-size: 92px;
+      }
+
+      .tagline {
+        color: rgb(255 255 255 / 0.72);
+        font-weight: 400;
+        letter-spacing: 0.01em;
+      }
+      .tile[data-size='small'] .tagline {
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .tile[data-size='marquee'] .tagline {
+        font-size: 34px;
+        margin-top: 20px;
+      }
+
+      .points {
+        display: flex;
+        color: rgb(255 255 255 / 0.62);
+      }
+      .tile[data-size='small'] .points {
+        display: none;
+      }
+      .tile[data-size='marquee'] .points {
+        gap: 34px;
+        margin-top: 40px;
+        font-size: 23px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tile" id="tile">
+      <div class="blob b1"></div>
+      <div class="blob b2"></div>
+      <div class="blob b3"></div>
+      <div class="content">
+        <div class="mark"><img src="../../extension/custmTab-logo.svg" alt="" /></div>
+        <div>
+          <div class="wordmark">cust*m Tab</div>
+          <div class="tagline">Your tab. Your rules.</div>
+          <div class="points">
+            <span>No tracking</span>
+            <span>26 search engines</span>
+            <span>Your own backgrounds</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const size = new URLSearchParams(location.search).get('size') || 'small';
+      document.getElementById('tile').dataset.size = size;
+    </script>
+  </body>
+</html>

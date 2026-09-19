@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>cust*m Tab preview harness</title>
+    <link rel="stylesheet" href="../../extension/shared.css" />
+    <link rel="stylesheet" href="../../extension/newtab.css" />
+    <link rel="stylesheet" href="../../extension/options.css" />
+    <link rel="stylesheet" href="../../extension/wizard.css" />
+    <style>
+      html,
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      /**
+       * Preview harness.
+       *
+       * Renders the real extension UI outside an extension context, so
+       * screenshots show what actually ships rather than a mock-up. It stubs
+       * only the browser APIs the pages touch, and seeds storage from the
+       * `?state=` query parameter.
+       *
+       * Usage: preview.html?page=newtab&state=<base64 JSON settings>
+       */
+      (function () {
+        const params = new URLSearchParams(location.search);
+
+        let seeded = {};
+        const raw = params.get('state');
+        if (raw) {
+          try {
+            seeded = JSON.parse(decodeURIComponent(atob(raw)));
+          } catch (e) {
+            console.error('preview: bad state parameter', e);
+          }
+        }
+
+        const area = (initial) => {
+          const data = new Map(Object.entries(initial || {}));
+          return {
+            get: async (keys) => {
+              if (keys == null) return Object.fromEntries(data);
+              if (typeof keys === 'string') {
+                return data.has(keys) ? { [keys]: data.get(keys) } : {};
+              }
+              const out = {};
+              for (const key of Array.isArray(keys) ? keys : Object.keys(keys)) {
+                if (data.has(key)) out[key] = data.get(key);
+              }
+              return out;
+            },
+            set: async (patch) => {
+              for (const [k, v] of Object.entries(patch)) data.set(k, v);
+            },
+            remove: async () => {},
+            clear: async () => data.clear(),
+          };
+        };
+
+        globalThis.chrome = {
+          runtime: {
+            id: 'preview',
+            getURL: (p) => '../../extension/' + String(p).replace(/^\//, ''),
+            openOptionsPage: async () => {},
+            onInstalled: { addListener() {} },
+            onStartup: { addListener() {} },
+          },
+          storage: {
+            local: area(seeded),
+            sync: area({}),
+            onChanged: { addListener() {} },
+          },
+          tabs: { create: async () => {}, update: async () => {} },
+          alarms: { create: async () => {}, onAlarm: { addListener() {} } },
+          notifications: { create: async () => {}, onClicked: { addListener() {} } },
+          permissions: {
+            contains: async () => true,
+            request: async () => true,
+            remove: async () => true,
+          },
+          extension: { isAllowedFileSchemeAccess: async () => false },
+          omnibox: {
+            setDefaultSuggestion() {},
+            onInputChanged: { addListener() {} },
+            onInputEntered: { addListener() {} },
+          },
+          action: { onClicked: { addListener() {} } },
+          i18n: { getMessage: (k) => k, getUILanguage: () => 'en-GB' },
+        };
+
+        /** Load the requested page's body and scripts. */
+        async function mount() {
+          const page = params.get('page') || 'newtab';
+          const html = await fetch('../../extension/' + page + '.html').then((r) =>
+            r.text()
+          );
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+
+          const sources = [...doc.querySelectorAll('script[src]')].map((s) =>
+            s.getAttribute('src')
+          );
+          doc.querySelectorAll('script').forEach((s) => s.remove());
+
+          document.body.replaceChildren(
+            ...[...doc.body.childNodes].map((n) => document.importNode(n, true))
+          );
+
+          // Relative asset paths in the page resolve against this harness
+          // directory, not extension/. Rewrite them so images actually load.
+          for (const el of document.querySelectorAll('img[src], [href]')) {
+            const attr = el.tagName === 'IMG' ? 'src' : 'href';
+            const value = el.getAttribute(attr);
+            if (value && !/^([a-z][a-z0-9+.-]*:|\/|#)/i.test(value)) {
+              el.setAttribute(attr, '../../extension/' + value);
+            }
+          }
+
+          for (const src of sources) {
+            await new Promise((resolve, reject) => {
+              const el = document.createElement('script');
+              el.src = '../../extension/' + src;
+              el.onload = resolve;
+              el.onerror = reject;
+              document.head.appendChild(el);
+            });
+          }
+
+          // Signal readiness so the screenshot tool knows when to capture.
+          setTimeout(
+            () => document.documentElement.setAttribute('data-preview-ready', ''),
+            500
+          );
+        }
+
+        mount().catch((e) => {
+          document.body.textContent = 'preview harness failed: ' + e.message;
+        });
+      })();
+    </script>
+  </body>
+</html>

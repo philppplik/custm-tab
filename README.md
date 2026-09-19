@@ -3,64 +3,141 @@
 </p>
 
 <p align="center">
-  <img src="extension/custmTab-logo.svg" alt="cust*m Tab logo" width="40" height="40">
+  <img src="extension/custmTab-logo.svg" alt="" width="40" height="40">
+  <br>
   <strong>cust*m Tab</strong> &mdash; <em>Your tab. Your rules.</em>
+</p>
+
+<p align="center">
+  <a href="https://github.com/philppplik/custm-tab/actions/workflows/ci.yml"><img src="https://github.com/philppplik/custm-tab/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/philppplik/custm-tab/actions/workflows/codeql.yml"><img src="https://github.com/philppplik/custm-tab/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
+  <a href="https://github.com/philppplik/custm-tab/releases/latest"><img src="https://img.shields.io/github/v/release/philppplik/custm-tab" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT"></a>
+</p>
+
+<p align="center">
+  <a href="https://philppplik.github.io/custm-tab/"><strong>Website</strong></a> &middot;
+  <a href="https://philppplik.github.io/custm-tab/privacy.html">Privacy</a> &middot;
+  <a href="extension/TECHNICAL.md">Technical docs</a> &middot;
+  <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 
 ---
 
-cust*m Tab replaces your new tab with either a **privacy-first dashboard** or
-**your own URL** — your choice, configured in 30 seconds via an onboarding
-wizard.
+cust*m Tab replaces the new tab page with either a **dashboard you configure** or
+**a URL of your own**. It has no account, no telemetry, and no server behind it.
 
-Works in **Chrome 121+** and **Firefox 142+** from one source tree.
+Runs in **Chrome 121+** and **Firefox 142+** from one source tree. Vanilla HTML,
+CSS and JavaScript, no runtime dependencies, and no build step needed to run it.
 
-## Why cust*m Tab
+## What it does
 
-<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Privacy by default.** DuckDuckGo and Brave are the top two default search options. No telemetry, no tracking, no accounts.
+**Bookmarks you edit in place.** Add, rename, delete and drag to reorder tiles
+directly on the tab. Changes persist immediately.
 
-<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Two modes.** A gradient dashboard (clock, greeting, search, bookmarks) or a direct redirect to any URL — `https://`, `file://`, or `chrome-extension://`.
+**26 search engines, privacy-forward first.** DuckDuckGo and Brave lead the
+list. Each engine carries an honest badge saying whether that provider builds a
+profile of you. Type `ct` in the address bar to search without opening a tab;
+`ct brave cats` forces a specific engine for one query.
 
-<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **26 search engines.** 5 curated engines in the dashboard picker + 20 more in settings, each with a privacy badge.
+**Backgrounds you choose.** Six gradient palettes, any solid colour via a
+picker, or a photo from Pexels. Pick a flat colour and the interface derives its
+own text contrast from that colour's WCAG luminance, so a pale background gets
+dark text rather than being disallowed.
 
-<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Live bookmark editor.** Add, edit, delete, and **drag-and-drop reorder** tiles right on the dashboard — changes persist instantly.
+**Photo backgrounds on your own key.** Set a search term and get a new photo
+every day, every hour, or on every tab. The photographer is always credited.
+See [docs/PEXELS.md](docs/PEXELS.md).
 
-<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Omnibox search.** Type `ct` in the address bar to search with your engine — `ct brave cats` forces Brave.
+**A sunrise reveal.** The background rises and blooms as the tab opens, animated
+on the compositor so it never delays first paint. Skipped automatically under
+`prefers-reduced-motion`.
 
-<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Optional sync.** Opt in to mirror mode, engine, theme and URL across devices via `chrome.storage.sync` (bookmarks stay local).
+**Or skip the dashboard.** Point the new tab at any URL, including a local file
+or another extension page.
 
-<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Zero-friction setup.** A 4-step wizard runs on first install: mode → bookmarks → search → theme.
+**Opt-in sync.** Mirror preferences across devices if you want to. Bookmarks and
+your API key never leave the device.
 
-<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **Persistence monitor.** An hourly check warns you if Chrome silently disables the new-tab override.
+## Privacy
 
-<img src="extension/custmTab-logo-bullet.svg" width="18" align="left" style="margin-right:6px"> **No frameworks.** Vanilla HTML/CSS/JS, well under 50 KB. Manifest V3.
+The extension collects nothing. Three things leave your browser, each only
+because you asked:
 
-## Privacy story
+| When                                 | What is sent                          | To                      |
+| ------------------------------------ | ------------------------------------- | ----------------------- |
+| You press Enter in the search bar    | Your query                            | The engine you selected |
+| You enable photo backgrounds         | Your search term and your own API key | `api.pexels.com`        |
+| You switch the icon source to remote | Each bookmark's hostname              | `icons.duckduckgo.com`  |
 
-cust*m Tab does **not** collect, transmit, or sell any user data. All settings
-and bookmarks stay in `chrome.storage.local` on your device. Search queries are
-sent only to the engine you select, and only when you press Enter. The two
-privacy-forward engines (DuckDuckGo, Brave) are surfaced first because they
-profile the least.
+By default, bookmark icons resolve from the browser's own on-device cache, with
+locally drawn letter tiles as the fallback.
 
-## Screenshots
+> Versions before 1.2.0 requested every bookmark icon from Google on every new
+> tab, which contradicted the privacy promise in this README. That is fixed; see
+> the [changelog](CHANGELOG.md).
 
-| Dashboard     | Settings      | Onboarding    |
-| ------------- | ------------- | ------------- |
-| _to be added_ | _to be added_ | _to be added_ |
+Full policy: <https://philppplik.github.io/custm-tab/privacy.html>
 
-## Install (development)
+## Install
 
-1. Open Chrome → `chrome://extensions`
-2. Enable **Developer mode** (top-right toggle)
-3. Click **Load unpacked** → select the `extension/` folder
-4. A new tab opens the onboarding wizard
+Store listings are pending. Until then, take the packages from the
+[latest release](https://github.com/philppplik/custm-tab/releases/latest):
 
-## Documentation
+**Chrome, Edge, Brave** - unzip `custm-tab-chrome-*.zip`, open
+`chrome://extensions`, enable Developer mode, choose _Load unpacked_, select the
+folder.
 
-- [README](extension/README.md) — quick start, file layout, cross-browser notes
-- [Technical Documentation](extension/TECHNICAL.md) — architecture, storage schema, permissions
+**Firefox** - unzip `custm-tab-firefox-*.zip`, open
+`about:debugging#/runtime/this-firefox`, choose _Load Temporary Add-on_, select
+`manifest.json`.
+
+A four-step wizard opens on first run.
+
+## Develop
+
+```bash
+git clone https://github.com/philppplik/custm-tab.git
+cd custm-tab
+npm install
+npm run verify
+```
+
+| Command                 | What it does                                                 |
+| ----------------------- | ------------------------------------------------------------ |
+| `npm run verify`        | Everything CI runs: format, lint, manifest validation, tests |
+| `npm test`              | Unit and integration tests                                   |
+| `npm run test:coverage` | Tests plus coverage thresholds                               |
+| `npm run build`         | Per-browser packages into `dist/`                            |
+| `npm run lint:ext`      | `web-ext lint` against the Firefox package                   |
+| `npm run screenshots`   | Serve the preview harness to regenerate store assets         |
+
+`extension/` loads unpacked in both browsers as-is. The Node tooling lints,
+tests and packages; it never compiles the source.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow and
+[extension/TECHNICAL.md](extension/TECHNICAL.md) for the architecture.
+
+## Repository layout
+
+```
+extension/     the add-on itself (this is what ships)
+docs/          GitHub Pages site, privacy policy, Pexels and store guides
+screenshots/   store assets, generated from the real UI
+scripts/       manifest validator and per-browser packaging
+tests/         Vitest suites with an in-memory chrome.* mock
+tools/preview/ harness that renders the real UI for screenshots
+```
+
+## Security
+
+Report vulnerabilities privately through
+[GitHub Security Advisories](https://github.com/philppplik/custm-tab/security/advisories/new),
+not a public issue. See [SECURITY.md](SECURITY.md).
+
+CodeQL, Dependabot, dependency review, and secret scanning with push protection
+all run on this repository.
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).

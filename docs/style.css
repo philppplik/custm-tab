@@ -1,0 +1,631 @@
+/* ============================================================
+   cust*m Tab - landing page
+   Static CSS, no build step, matching the extension itself.
+
+   THEME LOCK: this page is dark only, deliberately. The product's whole
+   identity is a dark ambient gradient; a light variant would show the visitor
+   something the extension does not look like by default. The page declares
+   `color-scheme: dark` so browser chrome matches rather than fighting it.
+   ============================================================ */
+
+h1,
+h2,
+h3,
+.wordmark {
+  line-height: 1.1;
+}
+
+:root {
+  color-scheme: dark;
+
+  --ink: #f6f4fb;
+  --ink-dim: rgb(246 244 251 / 0.66);
+  --ink-faint: rgb(246 244 251 / 0.4);
+
+  --base: #120434;
+  --line: rgb(255 255 255 / 0.12);
+  --line-soft: rgb(255 255 255 / 0.07);
+
+  /* One accent, used on every interactive surface across the whole page. */
+  --accent: #ff4d1a;
+  --accent-soft: rgb(255 77 26 / 0.16);
+
+  --shell: 1180px;
+
+  /* One radius system: pill for interactive, 20px for surfaces. */
+  --r-surface: 20px;
+  --r-pill: 999px;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--base);
+  color: var(--ink);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* ── Ambient backdrop ───────────────────────────────
+   The same three-blob construction the extension uses, so the page and the
+   product share one visual language rather than merely resembling each other. */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--base);
+}
+.ambient span {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  border-radius: 50%;
+  filter: blur(90px);
+}
+.ambient .a {
+  width: 130vw;
+  aspect-ratio: 1;
+  background: #29058e;
+  transform: translate(-50%, 58%);
+}
+.ambient .b {
+  width: 110vw;
+  aspect-ratio: 1.15;
+  background: #ff3300;
+  opacity: 0.4;
+  transform: translate(-50%, 64%);
+}
+.ambient .c {
+  width: 86vw;
+  aspect-ratio: 1.3;
+  background: #edd30f;
+  opacity: 0.24;
+  transform: translate(-50%, 70%);
+}
+
+main,
+header,
+footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Navigation: one line, 68px ─────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: rgb(18 4 52 / 0.72);
+  border-bottom: 1px solid var(--line-soft);
+}
+.nav .shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.brand img {
+  width: 26px;
+  height: 26px;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+.nav-links a {
+  color: var(--ink-dim);
+  text-decoration: none;
+  font-size: 15px;
+  transition: color 0.18s var(--ease);
+}
+.nav-links a:hover,
+.nav-links a:focus-visible {
+  color: var(--ink);
+}
+
+/* ── Buttons ─────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  white-space: nowrap;
+  padding: 13px 24px;
+  border-radius: var(--r-pill);
+  font-size: 15.5px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition:
+    transform 0.18s var(--ease),
+    background 0.18s var(--ease),
+    border-color 0.18s var(--ease);
+}
+.btn-primary {
+  background: var(--accent);
+  /* Near-black on orange clears 4.5:1; white on orange would not. */
+  color: #16060a;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+}
+.btn-primary:active {
+  transform: translateY(0) scale(0.985);
+}
+.btn-ghost {
+  color: var(--ink);
+  border-color: var(--line);
+  background: rgb(255 255 255 / 0.04);
+}
+.btn-ghost:hover {
+  border-color: rgb(255 255 255 / 0.3);
+  transform: translateY(-2px);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ── Hero: asymmetric split ─────────────────────────────────── */
+.hero {
+  padding: 84px 0 96px;
+}
+.hero .shell {
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  gap: 62px;
+  align-items: center;
+}
+.eyebrow {
+  display: inline-block;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: clamp(2.6rem, 5vw, 3.9rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+}
+.hero h1 em {
+  font-style: italic;
+  /* Descender clearance for the italic word. */
+  line-height: 1.12;
+  padding-bottom: 2px;
+  display: inline-block;
+}
+.hero p {
+  margin-top: 22px;
+  font-size: 18.5px;
+  color: var(--ink-dim);
+  max-width: 46ch;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 13px;
+  margin-top: 34px;
+}
+
+.shot {
+  border-radius: var(--r-surface);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  box-shadow: 0 40px 90px rgb(0 0 0 / 0.55);
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Showcase: horizontal scroll-snap ───────────────────────── */
+.showcase {
+  padding: 26px 0 96px;
+}
+.showcase h2 {
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  max-width: 20ch;
+}
+.showcase > .shell > p {
+  margin-top: 14px;
+  color: var(--ink-dim);
+  max-width: 56ch;
+}
+.rail {
+  display: flex;
+  gap: 22px;
+  margin-top: 40px;
+  padding: 4px 28px 22px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+.rail figure {
+  flex: 0 0 min(560px, 82vw);
+  scroll-snap-align: center;
+}
+.rail img {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.45);
+}
+.rail figcaption {
+  margin-top: 14px;
+  font-size: 15px;
+  color: var(--ink-dim);
+}
+.rail figcaption b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ── Privacy: editorial statement ───────────────────────────── */
+.privacy {
+  padding: 96px 0;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+.privacy blockquote {
+  font-size: clamp(1.6rem, 3.4vw, 2.5rem);
+  line-height: 1.24;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+  max-width: 21ch;
+}
+.privacy blockquote span {
+  color: var(--accent);
+}
+.ledger {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  border-top: 1px solid var(--line-soft);
+}
+.ledger div {
+  padding: 22px 22px 22px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.ledger dt {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+}
+.ledger dd {
+  margin-top: 7px;
+  font-size: 16.5px;
+  color: var(--ink);
+}
+
+/* ── Bento: five cells for five features ────────────────────── */
+.features {
+  padding: 96px 0;
+}
+.features h2 {
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  max-width: 18ch;
+}
+.bento {
+  margin-top: 42px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 18px;
+}
+.cell {
+  border-radius: var(--r-surface);
+  border: 1px solid var(--line-soft);
+  padding: 30px;
+  background: rgb(255 255 255 / 0.035);
+}
+.cell:nth-child(1) {
+  grid-column: span 4;
+  background:
+    radial-gradient(120% 140% at 12% 100%, rgb(255 77 26 / 0.22), transparent 62%),
+    rgb(255 255 255 / 0.035);
+}
+.cell:nth-child(2) {
+  grid-column: span 2;
+}
+.cell:nth-child(3) {
+  grid-column: span 2;
+}
+.cell:nth-child(4) {
+  grid-column: span 2;
+  background:
+    radial-gradient(130% 130% at 90% 0%, rgb(41 5 142 / 0.5), transparent 60%),
+    rgb(255 255 255 / 0.035);
+}
+.cell:nth-child(5) {
+  grid-column: span 2;
+}
+.cell h3 {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.cell p {
+  margin-top: 10px;
+  font-size: 15.5px;
+  color: var(--ink-dim);
+}
+
+/* ── Photo backgrounds: split ───────────────────────────────── */
+.photos {
+  padding: 0 0 96px;
+}
+.photos .shell {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 58px;
+  align-items: center;
+}
+.photos h2 {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  max-width: 16ch;
+}
+.photos p {
+  margin-top: 18px;
+  color: var(--ink-dim);
+  max-width: 50ch;
+}
+.photos p + p {
+  margin-top: 14px;
+}
+.photos a.inline {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent);
+}
+.photos a.inline:hover {
+  color: var(--accent);
+}
+
+/* ── Install ────────────────────────────────────────────────── */
+.install {
+  padding: 96px 0;
+  border-top: 1px solid var(--line-soft);
+  text-align: center;
+}
+.install h2 {
+  font-size: clamp(2rem, 3.6vw, 2.8rem);
+  letter-spacing: -0.03em;
+  font-weight: 600;
+}
+.install > .shell > p {
+  margin-top: 16px;
+  color: var(--ink-dim);
+  max-width: 52ch;
+  margin-inline: auto;
+}
+.install .hero-actions {
+  justify-content: center;
+}
+.steps {
+  margin: 44px auto 0;
+  max-width: 660px;
+  text-align: left;
+  display: grid;
+  gap: 2px;
+  counter-reset: step;
+}
+.steps li {
+  list-style: none;
+  counter-increment: step;
+  padding: 18px 0 18px 46px;
+  position: relative;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--ink-dim);
+  font-size: 16px;
+}
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 18px;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+.steps li b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.steps code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  background: rgb(255 255 255 / 0.07);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.foot {
+  padding: 40px 0 60px;
+  border-top: 1px solid var(--line-soft);
+}
+.foot .shell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+}
+.foot p {
+  font-size: 14.5px;
+  color: var(--ink-faint);
+}
+.foot nav {
+  display: flex;
+  gap: 22px;
+}
+.foot a {
+  color: var(--ink-dim);
+  font-size: 14.5px;
+  text-decoration: none;
+}
+.foot a:hover {
+  color: var(--ink);
+}
+
+/* ── Document pages (privacy) ───────────────────────────────── */
+.doc {
+  padding: 64px 0 96px;
+  max-width: 760px;
+}
+.doc h1 {
+  font-size: clamp(2.1rem, 4vw, 3rem);
+  letter-spacing: -0.035em;
+  font-weight: 600;
+}
+.doc .updated {
+  margin-top: 12px;
+  color: var(--ink-faint);
+  font-size: 15px;
+}
+.doc h2 {
+  margin-top: 48px;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+.doc p,
+.doc li {
+  margin-top: 14px;
+  color: var(--ink-dim);
+}
+.doc ul {
+  padding-left: 22px;
+}
+.doc strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.doc a {
+  color: var(--ink);
+  border-bottom: 1px solid var(--accent);
+  text-decoration: none;
+}
+.doc table {
+  margin-top: 22px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15.5px;
+}
+.doc th,
+.doc td {
+  text-align: left;
+  padding: 13px 14px 13px 0;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+}
+.doc th {
+  color: var(--ink);
+  font-weight: 600;
+}
+.doc td {
+  color: var(--ink-dim);
+}
+
+/* ── Scroll reveal ──────────────────────────────────
+   Motion communicates sequence: each section announces itself as it becomes
+   relevant. Driven by IntersectionObserver, never a scroll listener. */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s var(--ease),
+    transform 0.7s var(--ease);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hero .shell,
+  .photos .shell {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .hero {
+    padding: 56px 0 72px;
+  }
+  .bento {
+    grid-template-columns: 1fr;
+  }
+  .cell:nth-child(n) {
+    grid-column: span 1;
+  }
+  .nav-links a:not(.btn) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .btn:hover {
+    transform: none;
+  }
+}
