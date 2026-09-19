@@ -42,12 +42,12 @@
   --ct-radius-md: 20px;
   --ct-radius-sm: 12px;
 
-  --ct-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
+  --ct-font:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* ── Light theme overrides ──────────────────────── */
-:root[data-theme="light"] {
+:root[data-theme='light'] {
   --ct-bg-deep: #f4f1fb;
   --ct-text: #1b132b;
   --ct-text-dim: rgba(27, 19, 43, 0.6);
@@ -127,7 +127,7 @@
   font-family: var(--ct-font);
 }
 .ct-page::before {
-  content: "";
+  content: '';
   position: fixed;
   inset: 12px;
   border-radius: var(--ct-radius-md);
@@ -138,7 +138,8 @@
     rgba(237, 211, 15, 0.3) 40%,
     rgba(41, 5, 142, 0.4)
   );
-  -webkit-mask: linear-gradient(#000 0 0) content-box,
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -198,13 +199,13 @@
   outline: none;
   font-family: var(--ct-font);
 }
-:root[data-theme="light"] .ct-input {
+:root[data-theme='light'] .ct-input {
   background: rgba(255, 255, 255, 0.7);
   border-color: rgba(27, 19, 43, 0.1);
 }
 .ct-input:focus {
   border-color: rgba(255, 255, 255, 0.6);
 }
-:root[data-theme="light"] .ct-input:focus {
+:root[data-theme='light'] .ct-input:focus {
   border-color: var(--ct-purple);
 }

@@ -127,9 +127,9 @@ code {
   padding: 2px 7px;
   border-radius: 6px;
   font-size: 0.82rem;
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
-:root[data-theme="light"] code {
+:root[data-theme='light'] code {
   background: rgba(27, 19, 43, 0.08);
 }
 

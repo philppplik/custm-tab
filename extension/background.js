@@ -55,8 +55,7 @@ async function checkPersistence() {
   const noNewTabSinceStartup = !lastSeen || lastSeen < browserLastStartup;
 
   if (startupTooLongAgo && noNewTabSinceStartup) {
-    const cooldownExpired =
-      !lastNotified || now - lastNotified > NOTIFY_COOLDOWN_MS;
+    const cooldownExpired = !lastNotified || now - lastNotified > NOTIFY_COOLDOWN_MS;
     if (cooldownExpired) {
       await chrome.notifications.create(NOTIFICATION_ID, {
         type: 'basic',
@@ -87,12 +86,19 @@ chrome.action.onClicked.addListener(() => {
 });
 
 // ── Omnibox search (keyword: "ct") ────────────────
-// Load the shared engine registry into the SW context so we can build
+// Load the shared engine registry into the background context so we can build
 // search URLs without a separate copy.
-try {
-  importScripts('search-engines.js');
-} catch (e) {
-  console.warn('cust*m Tab: failed to import search-engines.js', e);
+//
+// Chrome runs this file as a service worker and needs importScripts(). Firefox
+// runs it as an event page, where importScripts() does not exist — there,
+// manifest `background.scripts` has already loaded search-engines.js ahead of
+// this file, so the registry is present either way.
+if (typeof importScripts === 'function') {
+  try {
+    importScripts('search-engines.js');
+  } catch (e) {
+    console.warn('cust*m Tab: failed to import search-engines.js', e);
+  }
 }
 
 const OMNIBOX = {

@@ -43,9 +43,9 @@ profile the least.
 
 ## Screenshots
 
-| Dashboard | Settings | Onboarding |
-|-----------|----------|------------|
-| *to be added* | *to be added* | *to be added* |
+| Dashboard     | Settings      | Onboarding    |
+| ------------- | ------------- | ------------- |
+| _to be added_ | _to be added_ | _to be added_ |
 
 ## Install (development)
 
