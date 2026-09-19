@@ -117,21 +117,38 @@ function pathsFrom(body, id) {
   return paths;
 }
 
+/**
+ * Emit a value as a JavaScript string literal.
+ *
+ * `JSON.stringify` rather than wrapping in quotes and escaping them by hand.
+ * This script writes executable JavaScript from the body of an HTTP response,
+ * which makes every interpolation a code-injection sink — and hand-rolled
+ * escaping reliably misses a case. Escaping quotes but not backslashes, for
+ * instance, turns an input ending in `\` into an unterminated literal and lets
+ * whatever follows it become code.
+ *
+ * JSON string syntax is a subset of JavaScript's, so the output is valid for
+ * any input, including quotes, backslashes and control characters.
+ */
+function literal(value) {
+  return JSON.stringify(String(value));
+}
+
 function render(glyphs) {
   const entries = Object.entries(glyphs)
     .map(
       ([ref, glyph]) =>
-        `    '${ref}': {\n` +
-        `      viewBox: '${glyph.viewBox}',\n` +
+        `    ${literal(ref)}: {\n` +
+        `      viewBox: ${literal(glyph.viewBox)},\n` +
         `      paths: [\n` +
-        glyph.paths.map((d) => `        '${d.replace(/'/g, "\\'")}',`).join('\n') +
+        glyph.paths.map((d) => `        ${literal(d)},`).join('\n') +
         `\n      ],\n` +
         `    },`
     )
     .join('\n');
 
   const map = Object.entries(MAP)
-    .map(([id, ref]) => `    ${id}: '${ref}',`)
+    .map(([id, ref]) => `    ${literal(id)}: ${literal(ref)},`)
     .join('\n');
 
   return `/**
@@ -160,7 +177,7 @@ ${map}
   });
 
   /** Used for an engine with no published brand mark, and for unknown ids. */
-  const FALLBACK = '${FALLBACK}';
+  const FALLBACK = ${literal(FALLBACK)};
 
   /** The glyph for a search engine id. Never returns null. */
   function forEngine(id) {
