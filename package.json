@@ -1,0 +1,37 @@
+{
+  "name": "custm-tab",
+  "version": "1.1.0",
+  "private": true,
+  "description": "cust*m Tab — Your tab. Your rules. A privacy-first, fully customisable new-tab extension for Chrome and Firefox.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/philppplik/custm-tab.git"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "validate:manifest": "node scripts/validate-manifest.mjs",
+    "build": "node scripts/build.mjs",
+    "lint:ext": "npm run build && web-ext lint --source-dir dist/firefox",
+    "verify": "npm run format:check && npm run lint && npm run validate:manifest && npm run test"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0",
+    "happy-dom": "^15.11.7",
+    "prettier": "^3.4.2",
+    "vitest": "^2.1.8",
+    "web-ext": "^8.3.0"
+  }
+}

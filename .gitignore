@@ -1,10 +1,20 @@
 # Build / OS artifacts
+dist/
 *.zip
 .DS_Store
 Thumbs.db
 
-# Node (if tooling added later)
+# Node tooling
 node_modules/
+coverage/
+
+# Local, never-committed secrets.
+# See docs/PEXELS.md — the Pexels API key belongs in the extension's own
+# settings UI (chrome.storage.local), not in the repository.
+*.local.js
+*.local.json
+.env
+.env.*
 
 # Editor
 .vscode/
