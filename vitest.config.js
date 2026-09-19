@@ -16,7 +16,7 @@ export default defineConfig({
       // load and are covered by their own DOM tests; listing modules one by
       // one keeps the threshold meaningful instead of diluted by files that
       // no unit test can reach. Add each new testable module here.
-      include: ['extension/search-engines.js', 'extension/store.js'],
+      include: ['extension/search-engines.js', 'extension/store.js', 'extension/url.js'],
       all: true,
       thresholds: {
         lines: 80,
