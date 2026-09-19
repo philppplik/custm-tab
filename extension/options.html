@@ -117,11 +117,184 @@
 
         <!-- Appearance card -->
         <section class="ct-card">
-          <h2 class="card-title">Appearance</h2>
-          <div class="theme-row">
-            <button class="theme-chip" data-theme="auto">◐ Auto</button>
-            <button class="theme-chip" data-theme="light">☀ Light</button>
-            <button class="theme-chip" data-theme="dark">☾ Dark</button>
+          <h2 class="card-title">Interface</h2>
+          <p class="card-sub">
+            Everything on this card changes as you touch it, right here on this page.
+          </p>
+
+          <div class="field">
+            <span class="field__label">Theme</span>
+            <div class="theme-row">
+              <button class="theme-chip" data-theme="auto">◐ Auto</button>
+              <button class="theme-chip" data-theme="light">☀ Light</button>
+              <button class="theme-chip" data-theme="dark">☾ Dark</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="field__label">Material</span>
+            <div
+              class="theme-row"
+              id="surface-row"
+              role="radiogroup"
+              aria-label="Interface material"
+            >
+              <button class="theme-chip" type="button" data-surface="glass" role="radio">
+                Glass
+              </button>
+              <button
+                class="theme-chip"
+                type="button"
+                data-surface="frosted"
+                role="radio"
+              >
+                Frosted
+              </button>
+              <button class="theme-chip" type="button" data-surface="solid" role="radio">
+                Solid
+              </button>
+            </div>
+            <p class="field__hint" id="surface-note" aria-live="polite"></p>
+          </div>
+
+          <div class="field" id="solid-tone-field" hidden>
+            <span class="field__label">Solid tone</span>
+            <div
+              class="theme-row"
+              id="solid-tone-row"
+              role="radiogroup"
+              aria-label="Solid surface tone"
+            >
+              <button class="theme-chip" type="button" data-tone="dark" role="radio">
+                Dark
+              </button>
+              <button class="theme-chip" type="button" data-tone="light" role="radio">
+                Light
+              </button>
+            </div>
+          </div>
+
+          <!-- Clock -->
+          <label class="toggle-row">
+            <input type="checkbox" id="toggle-clock" class="toggle-checkbox" />
+            <span class="toggle-label">
+              Show the clock
+              <span class="toggle-hint">The large time at the top of your tab.</span>
+            </span>
+          </label>
+
+          <div class="sub-settings" id="clock-settings">
+            <div class="field-row">
+              <div class="field">
+                <label class="field__label" for="clock-format">Format</label>
+                <select id="clock-format" class="ct-input">
+                  <option value="auto">Follow my language</option>
+                  <option value="24">24-hour</option>
+                  <option value="12">12-hour</option>
+                </select>
+              </div>
+              <div class="field">
+                <label class="field__label" for="clock-font">Typeface</label>
+                <select id="clock-font" class="ct-input"></select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="clock-size"
+                >Size <span id="clock-size-value" class="field__value">100%</span></label
+              >
+              <input
+                type="range"
+                id="clock-size"
+                class="range-input"
+                min="50"
+                max="250"
+                step="5"
+              />
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="clock-weight"
+                >Weight
+                <span id="clock-weight-value" class="field__value">200</span></label
+              >
+              <input
+                type="range"
+                id="clock-weight"
+                class="range-input"
+                min="100"
+                max="800"
+                step="100"
+              />
+            </div>
+
+            <label class="toggle-row">
+              <input type="checkbox" id="toggle-seconds" class="toggle-checkbox" />
+              <span class="toggle-label">
+                Show seconds
+                <span class="toggle-hint"
+                  >Redraws every second instead of every ten.</span
+                >
+              </span>
+            </label>
+          </div>
+
+          <label class="toggle-row">
+            <input type="checkbox" id="toggle-date" class="toggle-checkbox" />
+            <span class="toggle-label">
+              Show the date
+              <span class="toggle-hint">Weekday, day and month, under the clock.</span>
+            </span>
+          </label>
+
+          <!-- Greeting -->
+          <div class="field">
+            <span class="field__label">Greeting</span>
+            <div
+              class="theme-row"
+              id="greeting-row"
+              role="radiogroup"
+              aria-label="Greeting style"
+            >
+              <button class="theme-chip" type="button" data-greeting="time" role="radio">
+                Time of day
+              </button>
+              <button class="theme-chip" type="button" data-greeting="text" role="radio">
+                My own words
+              </button>
+              <button class="theme-chip" type="button" data-greeting="none" role="radio">
+                None
+              </button>
+            </div>
+          </div>
+
+          <div class="field" id="greeting-name-field">
+            <label class="field__label" for="greeting-name">Your name (optional)</label>
+            <input
+              type="text"
+              id="greeting-name"
+              class="ct-input"
+              maxlength="32"
+              autocomplete="off"
+              placeholder="e.g. Philipp"
+            />
+            <p class="field__hint" id="greeting-preview" aria-live="polite"></p>
+          </div>
+
+          <div class="field" id="greeting-text-field" hidden>
+            <label class="field__label" for="greeting-text">Headline</label>
+            <input
+              type="text"
+              id="greeting-text"
+              class="ct-input"
+              maxlength="48"
+              autocomplete="off"
+              placeholder="cust*m Tab"
+            />
+            <p class="field__hint">
+              Shown large, in place of the greeting. Turn the clock and date off for a tab
+              that is just this line and a search bar.
+            </p>
           </div>
         </section>
 
@@ -136,6 +309,7 @@
               aria-describedby="icon-mode-note"
             >
               <option value="local">On this device (recommended)</option>
+              <option value="site">From each site directly</option>
               <option value="monogram">Letter tiles only</option>
               <option value="remote">Fetch from DuckDuckGo</option>
             </select>
@@ -154,10 +328,15 @@
               </p>
               <p>
                 <strong>On this device</strong> uses the browser own icon cache in Chrome,
-                and falls back to letter tiles in Firefox, which has no equivalent.
-                <strong>Letter tiles</strong> never touch the network at all.
-                <strong>Fetch from DuckDuckGo</strong> discloses each bookmark hostname
-                and nothing else — path, query and fragment are never sent.
+                and falls back to letter tiles in Firefox, which has no equivalent. It
+                only knows sites you have actually visited, so a freshly added bookmark
+                may show a letter tile until you open it once.
+                <strong>From each site directly</strong> asks the bookmarked site for its
+                own icon. No third party is involved, but each of those sites does learn
+                when you open a new tab. <strong>Letter tiles</strong> never touch the
+                network at all. <strong>Fetch from DuckDuckGo</strong> discloses each
+                bookmark hostname and nothing else — path, query and fragment are never
+                sent.
               </p>
             </div>
           </details>
@@ -209,6 +388,49 @@
               ></span>
               <span class="bg-type__label">Photo</span>
             </button>
+            <button
+              class="bg-type__opt"
+              type="button"
+              data-bg-type="image"
+              role="radio"
+              aria-checked="false"
+            >
+              <span
+                class="bg-type__swatch bg-type__swatch--image"
+                aria-hidden="true"
+              ></span>
+              <span class="bg-type__label">Your image</span>
+            </button>
+          </div>
+
+          <!-- Own image -->
+          <div class="sub-settings" id="bg-image-settings" hidden>
+            <div class="field">
+              <span class="field__label">Picture</span>
+              <div class="image-picker">
+                <!-- A real file input, deliberately: it opens the operating
+                     system's own picker, so the extension never needs
+                     permission to read anything from disk. -->
+                <input
+                  type="file"
+                  id="bg-image-file"
+                  class="image-picker__input"
+                  accept="image/png,image/jpeg,image/webp"
+                />
+                <label class="ct-btn-ghost image-picker__button" for="bg-image-file"
+                  >Choose a picture…</label
+                >
+                <button type="button" id="bg-image-clear" class="ct-btn-ghost" hidden>
+                  Remove
+                </button>
+              </div>
+              <p id="bg-image-status" class="field__hint" aria-live="polite"></p>
+              <p class="field__hint">
+                Kept on this device only — never uploaded, never synced, and left out of
+                settings exports. Large pictures are scaled down to fit the storage your
+                browser allows.
+              </p>
+            </div>
           </div>
 
           <!-- Gradient -->
@@ -317,7 +539,11 @@
               even “every new tab” touches the network only a couple of times a day and
               stays well inside the Pexels rate limit.
             </p>
+          </div>
 
+          <!-- Shared by both picture backgrounds: a Pexels photo and your own
+               image need exactly the same scrim and blur to stay readable. -->
+          <div class="sub-settings" id="bg-picture-settings" hidden>
             <div class="field">
               <label class="field__label" for="bg-overlay"
                 >Darken <span id="bg-overlay-value" class="field__value">35%</span></label
@@ -415,7 +641,9 @@
     <script src="compat.js"></script>
     <script src="url.js"></script>
     <script src="dom.js"></script>
+    <script src="icons.js"></script>
     <script src="favicon.js"></script>
+    <script src="appearance.js"></script>
     <script src="backgrounds.js"></script>
     <script src="pexels.js"></script>
     <script src="search-engines.js"></script>

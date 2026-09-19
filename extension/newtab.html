@@ -41,9 +41,11 @@
 
     <!-- DASHBOARD -->
     <main class="dashboard-container" id="dashboard">
-      <div class="clock-block">
-        <div class="greeting" id="greeting">Hello</div>
-        <div class="clock" id="clock" aria-live="off">--:--</div>
+      <!-- Every row here is optional. newtab.js marks the ones the user
+           turned off [hidden], and the whole block when none remain. -->
+      <div class="clock-block" id="clock-block">
+        <div class="greeting" id="greeting"></div>
+        <div class="clock" id="clock" aria-live="off"></div>
         <div class="date-line" id="date-line"></div>
       </div>
 
@@ -59,7 +61,7 @@
               aria-expanded="false"
               aria-controls="engine-menu"
             >
-              <span class="engine-icon" id="engine-icon">🦆</span>
+              <span class="engine-icon" id="engine-icon"></span>
               <span class="engine-caret" aria-hidden="true">▾</span>
             </button>
             <div class="engine-menu" id="engine-menu" role="listbox" hidden></div>
@@ -116,7 +118,9 @@
     <script src="compat.js"></script>
     <script src="url.js"></script>
     <script src="dom.js"></script>
+    <script src="icons.js"></script>
     <script src="favicon.js"></script>
+    <script src="appearance.js"></script>
     <script src="backgrounds.js"></script>
     <script src="pexels.js"></script>
     <script src="search-engines.js"></script>

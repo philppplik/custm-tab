@@ -17,12 +17,21 @@
   const store = window.CUSTM_STORE;
   const engines = window.CUSTM_ENGINES;
   const favicons = window.CUSTM_FAVICON;
+  const icons = window.CUSTM_ICONS;
+  const appearance = window.CUSTM_APPEARANCE;
   const backgrounds = window.CUSTM_BACKGROUND;
   const pexels = window.CUSTM_PEXELS;
 
   const $ = (id) => document.getElementById(id);
 
+  /**
+   * How often the clock redraws.
+   *
+   * Ten seconds is enough for minute precision without a visible lag, but a
+   * clock showing seconds has to tick every second or it is simply wrong.
+   */
   const CLOCK_INTERVAL_MS = 10000;
+  const CLOCK_SECONDS_INTERVAL_MS = 1000;
   const GREETING_INTERVAL_MS = 60000;
   /** How long to wait before offering a direct link when framing looks blocked. */
   const FRAME_FALLBACK_MS = 2500;
@@ -61,43 +70,71 @@
     });
   }
 
-  /* ── Clock and greeting ────────────────────────────────────────────── */
-  function updateClock() {
-    const now = new Date();
-    const clock = $('clock');
-    const date = $('date-line');
-    if (clock) {
-      clock.textContent = now.toLocaleTimeString(LOCALE, {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    }
-    if (date) {
-      date.textContent = now.toLocaleDateString(LOCALE, {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-      });
-    }
+  /* ── Clock and greeting ────────────────────────────────────────────────
+   * Three independent rows, each of which the user can switch off. When all
+   * three are off the whole block is hidden rather than left as an empty flex
+   * child, so the search bar moves up to where it belongs.
+   */
+
+  /** The appearance config, or the defaults before settings have loaded. */
+  function appearanceConfig() {
+    return appearance.normalize(settings ? settings.appearance : null);
   }
 
-  const GREETINGS = {
-    morning: 'Good morning',
-    afternoon: 'Good afternoon',
-    evening: 'Good evening',
-    night: 'Good night',
-  };
+  function updateClock() {
+    const config = appearanceConfig();
+    const now = new Date();
 
-  function greetingKey(hour) {
-    if (hour >= 5 && hour < 12) return 'morning';
-    if (hour >= 12 && hour < 17) return 'afternoon';
-    if (hour >= 17 && hour < 22) return 'evening';
-    return 'night';
+    const clock = $('clock');
+    if (clock) {
+      clock.hidden = !config.clock.show;
+      clock.textContent = config.clock.show
+        ? appearance.formatClock(config, now, LOCALE)
+        : '';
+    }
+
+    const date = $('date-line');
+    if (date) {
+      date.hidden = !config.date.show;
+      date.textContent = config.date.show
+        ? now.toLocaleDateString(LOCALE, {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+          })
+        : '';
+    }
   }
 
   function updateGreeting() {
+    const config = appearanceConfig();
     const el = $('greeting');
-    if (el) el.textContent = GREETINGS[greetingKey(new Date().getHours())];
+    if (!el) return;
+
+    const line = appearance.greetingFor(config, new Date());
+    el.hidden = !line;
+    el.textContent = line;
+
+    // Text mode is styled as the headline rather than as a caption above the
+    // clock, so the stylesheet needs to know which of the two it is drawing.
+    const block = $('clock-block');
+    if (block) block.dataset.greeting = config.greeting.mode;
+  }
+
+  /** Hide the whole block once every row inside it is off. */
+  function updateClockBlock() {
+    const config = appearanceConfig();
+    const block = $('clock-block');
+    if (!block) return;
+
+    const hasGreeting = appearance.greetingFor(config, new Date()) !== '';
+    block.hidden = !config.clock.show && !config.date.show && !hasGreeting;
+  }
+
+  function renderClockBlock() {
+    updateClock();
+    updateGreeting();
+    updateClockBlock();
   }
 
   /* ── Search ────────────────────────────────────────────────────────── */
@@ -125,7 +162,7 @@
           },
         },
         [
-          dom.el('span', { class: 'engine-item__icon', text: engine.icon }),
+          dom.el('span', { class: 'engine-item__icon' }, [icons.engineIcon(engine.id)]),
           dom.el('span', { class: 'e-name', text: engine.name }),
           dom.el('span', { class: `e-privacy ${engine.privacy}`, text: engine.privacy }),
         ]
@@ -139,7 +176,7 @@
     const engine = engines.getById(currentEngine);
     const icon = $('engine-icon');
     const button = $('engine-current');
-    if (icon) icon.textContent = engine.icon;
+    if (icon) dom.replace(icon, [icons.engineIcon(engine.id, { size: 18 })]);
     if (button) button.setAttribute('aria-label', `Search engine: ${engine.name}`);
   }
 
@@ -189,9 +226,19 @@
       width: '32',
       height: '32',
     });
-    // A cached favicon can be missing and a remote one can 404; swap in the
-    // monogram rather than leaving a broken-image tile.
+    // A site favicon can 404 and a remote one can fail; swap in the monogram
+    // rather than leaving a broken-image tile.
     image.addEventListener('error', () => image.replaceWith(monogram(icon.fallback)));
+
+    // Chrome's local cache never 404s — it answers with a generic placeholder,
+    // which is why every tile looked blank instead of falling back. That case
+    // can only be caught after the fact, by comparing the bytes.
+    if (icon.local) {
+      favicons.verifyLocal(icon.src).then((real) => {
+        if (!real && image.isConnected) image.replaceWith(monogram(icon.fallback));
+      });
+    }
+
     return image;
   }
 
@@ -472,6 +519,15 @@
   async function applyBackground() {
     const config = settings.background;
 
+    // The user's own picture is already on the device — no request, no key,
+    // no failure mode beyond "they never picked one", which falls back to the
+    // gradient the same way a failed photo fetch does.
+    if (config.type === 'image') {
+      const src = settings.backgroundImage;
+      if (!src) return backgrounds.apply(document, { ...config, type: 'gradient' }, null);
+      return backgrounds.apply(document, config, { src });
+    }
+
     if (config.type !== 'photo') {
       return backgrounds.apply(document, config, null);
     }
@@ -553,11 +609,6 @@
 
   /* ── Boot ──────────────────────────────────────────────────────────── */
   (async () => {
-    updateClock();
-    updateGreeting();
-    setInterval(updateClock, CLOCK_INTERVAL_MS);
-    setInterval(updateGreeting, GREETING_INTERVAL_MS);
-
     // Marks the tab as rendered, for the background persistence check.
     try {
       await api.storage.local.set({ lastSeen: Date.now() });
@@ -575,6 +626,22 @@
     currentEngine = settings.searchEngine;
     bookmarks = settings.bookmarks;
 
+    // The clock renders only once settings are known. Drawing it first would
+    // be marginally faster but would flash a clock at every user who turned
+    // it off, which is the more visible wrong.
+    const surfaceTheme = appearance.apply(document, settings.appearance);
+    renderClockBlock();
+
+    const clockConfig = appearanceConfig().clock;
+    setInterval(
+      updateClock,
+      clockConfig.seconds ? CLOCK_SECONDS_INTERVAL_MS : CLOCK_INTERVAL_MS
+    );
+    setInterval(() => {
+      updateGreeting();
+      updateClockBlock();
+    }, GREETING_INTERVAL_MS);
+
     // Redirect mode never shows the dashboard, so skip the background work
     // entirely rather than fetching a photo nobody will see.
     if (settings.mode === 'redirect' && settings.targetUrl) {
@@ -590,9 +657,13 @@
     backgrounds.playSunrise(document, settings.sunrise);
 
     const backgroundTheme = await applyBackground();
-    // An explicit theme choice wins; `auto` defers to what the background
-    // needs, which is the only way a user-picked pale colour stays readable.
-    applyTheme(settings.theme === 'auto' ? backgroundTheme : settings.theme);
+    // Precedence, strongest first: an explicit theme choice, then a solid
+    // surface (an opaque white panel cannot carry white text whatever the
+    // background is doing), then what the background itself needs — which is
+    // the only way a user-picked pale colour stays readable.
+    applyTheme(
+      settings.theme === 'auto' ? surfaceTheme || backgroundTheme : settings.theme
+    );
 
     initDashboard();
     document.body.classList.add('is-ready');
