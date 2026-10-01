@@ -312,11 +312,116 @@
         }
       }
     </style>
+    <style id="product-design-system">
+      body {
+        background: #180646;
+        color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background-image:
+          radial-gradient(ellipse at 50% 20%, #ff330077, transparent 34%),
+          radial-gradient(ellipse at 75% 30%, #29058e, transparent 50%);
+        background-attachment: fixed;
+      }
+      :root {
+        --accent: #ff3300;
+      }
+      h1,
+      h2 {
+        font-family: inherit;
+        font-weight: 300;
+        letter-spacing: -0.045em;
+      }
+      h1 {
+        font-size: clamp(50px, 6vw, 86px);
+      }
+      em {
+        color: white;
+        font-style: normal;
+        font-weight: 650;
+      }
+      .nav {
+        margin-top: 22px;
+        border: 1px solid #ffffff30;
+        border-radius: 40px;
+        background: linear-gradient(135deg, #ffffff1a, #ffffff05);
+        backdrop-filter: blur(20px);
+        padding-top: 22px;
+        padding-bottom: 22px;
+      }
+      .hero {
+        text-align: center;
+        max-width: 950px;
+        margin: auto;
+      }
+      .lead {
+        margin: auto;
+        color: #ffffffbd;
+      }
+      .actions {
+        justify-content: center;
+      }
+      .meta {
+        color: #ffffffa0;
+      }
+      .grid article {
+        background: #1b132bcc;
+        backdrop-filter: blur(20px);
+        border: 1px solid #ffffff30;
+        border-radius: 20px;
+        padding: 30px;
+      }
+      .grid {
+        gap: 20px;
+      }
+      .visual {
+        border-radius: 40px;
+        box-shadow: 0 30px 60px #0007;
+      }
+      .visual .bar {
+        background: #1b132bdd;
+      }
+      .section h2 {
+        text-align: center;
+        font-size: clamp(38px, 5vw, 60px);
+      }
+      .section p {
+        color: #ffffffc0;
+      }
+      .hero:after {
+        display: none;
+      }
+      .install pre {
+        background: #1b132bcc;
+        border-radius: 20px;
+      }
+      .brand img {
+        width: 30px;
+        vertical-align: middle;
+        margin-right: 12px;
+      }
+    </style>
+    <style>
+      .eyebrow,
+      .number {
+        color: #ffac80;
+      }
+      .install pre {
+        color: #ffac80;
+      }
+      footer {
+        color: #ffffffb0;
+      }
+    </style>
   </head>
   <body>
     <a class="skip" href="#main">Zum Inhalt</a>
     <header class="wrap nav">
-      <a class="brand" href="./">cust*m Tab</a>
+      <a class="brand" href="./"
+        ><img
+          alt=""
+          src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTk5IiBoZWlnaHQ9IjE5OSIgdmlld0JveD0iMCAwIDE5OSAxOTkiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMF81MTBfMTUzKSI+CjxwYXRoIGQ9Ik05MC42OTA5IDE3NS4zNDlDODkuNzg5NyAxNzYuNzk2IDg3Ljg2NjMgMTc3LjIwMiA4Ni40NTczIDE3Ni4yNDRMNzEuOTc3OSAxNjYuMzk0QzcwLjUyODcgMTY1LjQwOCA3MC4yMjk3IDE2My4zOTUgNzEuMzI5NiAxNjIuMDMxTDEwMC4zNyAxMjYuMDA2QzEwMS43MjEgMTI0LjMyOSAxMDAuOTE5IDEyMS44MTcgOTguODQ1MSAxMjEuMjM1TDU5LjEwMzMgMTEwLjA3OEM1Ny40MjY2IDEwOS42MDggNTYuNTAxNiAxMDcuODEzIDU3LjA5MTIgMTA2LjE3NEw2Mi40ODgzIDkxLjE3NDJDNjMuMDYzNyA4OS41NzQ5IDY0Ljg1MTUgODguNzcyNiA2Ni40Mjg4IDg5LjQwNThMMTA0LjE5NSAxMDQuNTY4QzEwNi4yNDMgMTA1LjM5IDEwOC40NDggMTAzLjc5NCAxMDguMzA3IDEwMS41OTFMMTA1LjU4NCA1OS4xOTIyQzEwNS40NzMgNTcuNDYzMyAxMDYuODQ2IDU2IDEwOC41NzggNTZIMTI2LjYwMkMxMjguMzM0IDU2IDEyOS43MDYgNTcuNDYyOSAxMjkuNTk2IDU5LjE5MTVMMTI2Ljg4MSAxMDEuNjMyQzEyNi43MzggMTAzLjg2OCAxMjkuMDA3IDEwNS40NjYgMTMxLjA2NCAxMDQuNTc3TDE2OS4xNTQgODguMTE5N0MxNzAuNzc2IDg3LjQxODggMTcyLjY0OSA4OC4yNjQ4IDE3My4xOTYgODkuOTQ1TDE3OC4wNjIgMTA0Ljg5MkMxNzguNTc4IDEwNi40NzkgMTc3LjcwMSAxMDguMTgyIDE3Ni4xMDkgMTA4LjY4M0wxMzcuMDc2IDEyMC45NTdDMTM1LjA1MyAxMjEuNTkzIDEzNC4zMTEgMTI0LjA3MiAxMzUuNjUyIDEyNS43MTVMMTYzLjg2NCAxNjAuMjg3QzE2NC45NjEgMTYxLjYzMiAxNjQuNjkyIDE2My42MjUgMTYzLjI3NiAxNjQuNjNMMTQ4LjU2OCAxNzUuMDc0QzE0Ny4xNTYgMTc2LjA3NiAxNDUuMTkgMTc1LjY3OCAxNDQuMjc5IDE3NC4yMDVMMTIwLjQ5MSAxMzUuNzEzQzExOS4zMjEgMTMzLjgyIDExNi41NjkgMTMzLjgxNSAxMTUuMzkyIDEzNS43MDRMOTAuNjkwOSAxNzUuMzQ5WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE0OS4zMzMgNC4xNjY2M0g0OS42NjY3QzI0LjUzNzcgNC4xNjY2MyA0LjE2NjY5IDI0LjUzNzcgNC4xNjY2OSA0OS42NjY2VjE0OS4zMzNDNC4xNjY2OSAxNzQuNDYyIDI0LjUzNzcgMTk0LjgzMyA0OS42NjY3IDE5NC44MzNIMTQ5LjMzM0MxNzQuNDYyIDE5NC44MzMgMTk0LjgzMyAxNzQuNDYyIDE5NC44MzMgMTQ5LjMzM1Y0OS42NjY2QzE5NC44MzMgMjQuNTM3NyAxNzQuNDYyIDQuMTY2NjMgMTQ5LjMzMyA0LjE2NjYzWiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI3Ii8+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfNTEwXzE1MyI+CjxyZWN0IHdpZHRoPSIxOTkiIGhlaWdodD0iMTk5IiBmaWxsPSJ3aGl0ZSIvPgo8L2NsaXBQYXRoPgo8L2RlZnM+Cjwvc3ZnPgo="
+        />cust*m Tab</a
+      >
       <nav>
         <a href="./#features">Features</a
         ><a
