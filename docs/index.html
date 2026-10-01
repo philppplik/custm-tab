@@ -1,4 +1,542 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>cust*m Tab - Ein neuer Tab. Ganz deiner.</title><meta name="description" content="Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne Telemetrie."><link rel="canonical" href="https://custmtab.philipp-paulik.de/"><meta name="theme-color" content="#111313"><meta property="og:type" content="website"><meta property="og:locale" content="de_DE"><meta property="og:site_name" content="cust*m Tab"><meta property="og:title" content="cust*m Tab - Ein neuer Tab. Ganz deiner."><meta property="og:description" content="Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne Telemetrie."><meta property="og:url" content="https://custmtab.philipp-paulik.de/"><meta property="og:image" content="https://custmtab.philipp-paulik.de/assets/01-dashboard-aurora.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="cust*m Tab - Ein neuer Tab. Ganz deiner."><meta name="twitter:description" content="Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne Telemetrie."><meta name="twitter:image" content="https://custmtab.philipp-paulik.de/assets/01-dashboard-aurora.jpg"><style>:root{--accent:#c8a8ff}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#111313;color:#eeeae3;font:16px/1.65 Arial,sans-serif}a{color:inherit;text-decoration:none}a:hover{color:var(--accent)}.wrap{max-width:1200px;margin:auto;padding:0 6%}.nav{display:flex;justify-content:space-between;align-items:center;padding-top:28px;padding-bottom:28px;border-bottom:1px solid #ffffff20}.brand{font-weight:700;font-size:25px;letter-spacing:-1px}.nav nav{display:flex;gap:25px;font-size:13px}.tag,.eyebrow{font:11px/1.5 monospace;letter-spacing:2px;color:var(--accent)}.hero{padding-top:95px;padding-bottom:85px;position:relative}.hero:after{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(ellipse at 90% 10%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 60%)}h1,h2{font-family:Georgia,serif;font-weight:400;line-height:1.04;letter-spacing:-3px}h1{font-size:clamp(52px,7.3vw,100px);margin:25px 0 30px}em{font-weight:400;color:var(--accent)}.lead{max-width:670px;color:#bdbeb8;font-size:19px}.actions{display:flex;flex-wrap:wrap;gap:14px;margin:32px 0}.button{border:1px solid #ffffff30;padding:12px 23px;border-radius:100px;font-size:14px;display:inline-block}.primary{background:var(--accent);color:#101313;border-color:var(--accent)}.primary:hover{color:#101313;filter:brightness(1.1)}.meta{color:#919790;font:12px/1.8 monospace}.visual{border:1px solid #ffffff24;border-radius:14px;background:#191c1c;overflow:hidden;margin:0 0 70px}.visual img{display:block;width:100%;height:auto}.visual .bar{padding:12px 20px;border-bottom:1px solid #ffffff18;font:11px monospace;color:#999}.terminal{padding:40px;font:clamp(13px,2vw,19px)/2 monospace}.terminal span{color:var(--accent)}.section{padding:65px 0;border-top:1px solid #ffffff20}h2{font-size:clamp(38px,5vw,62px);margin:15px 0 35px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:45px}.grid article{border-top:1px solid #ffffff20;padding-top:20px}.number{color:var(--accent);font:12px monospace}h3{font-size:21px;font-weight:400;margin:15px 0 8px}p{color:#bdbeb8}.install{display:grid;grid-template-columns:1fr 1fr;gap:50px}.install pre{padding:22px;background:#1b1e1e;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid #ffffff24;color:var(--accent);font-size:13px}.faq{max-width:820px}details{border-top:1px solid #ffffff25;padding:20px 0}summary{cursor:pointer;font-size:19px}footer{padding:45px 0;color:#9ca19a;font-size:13px}footer .links{display:flex;flex-wrap:wrap;gap:22px;margin-top:20px}.legal{max-width:850px;padding-top:60px;padding-bottom:60px}.legal h1{font-size:60px}.legal h2{font:26px Georgia;letter-spacing:0;line-height:1.2;margin-top:35px}.legal a{text-decoration:underline}.skip{position:absolute;top:-100px}.skip:focus{top:0;background:#fff;color:#000;padding:10px}@media(max-width:650px){.nav nav{gap:12px;font-size:11px}.brand{font-size:21px}.hero{padding-top:65px;padding-bottom:45px}h1{letter-spacing:-2px}.lead{font-size:17px}.grid,.install{grid-template-columns:1fr;gap:25px}.terminal{padding:20px;font-size:12px}.section{padding:45px 0}.visual{margin-bottom:40px}.legal h1{font-size:44px}.nav nav a:first-child{display:none}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}</style></head><body><a class="skip" href="#main">Zum Inhalt</a><header class="wrap nav"><a class="brand" href="./">cust*m Tab</a><nav><a href="./#features">Features</a><a href="https://github.com/philppplik/custm-tab/blob/main/extension/TECHNICAL.md">Dokumentation ↗</a><a href="https://github.com/philppplik/custm-tab">GitHub ↗</a></nav></header><main id="main" class="wrap"><section class="hero"><span class="eyebrow">YOUR TAB. YOUR RULES.</span><h1>Ein neuer Tab.<br><em>Ganz deiner.</em></h1><p class="lead">Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne Telemetrie.</p><div class="actions"><a class="button primary" href="https://github.com/philppplik/custm-tab/releases/latest">Release herunterladen ↗</a><a class="button" href="https://github.com/philppplik/custm-tab">Quellcode ansehen ↗</a></div><div class="meta">OPEN SOURCE / MIT · Chrome 121+ / Firefox 142+<br>Repository-Stand: Version 1.3.0 · 1. Oktober 2026</div></section><figure class="visual" style="margin-left:0;margin-right:0"><div class="bar">CUST*M TAB / ECHTE DASHBOARD-ANSICHT AUS DEM REPOSITORY</div><img src="assets/01-dashboard-aurora.jpg" alt="cust*m Tab Dashboard mit Uhr, Suchleiste und Lesezeichen auf violettem Verlauf" width="1280" height="800"></figure><section class="section" id="features"><span class="eyebrow">GUTE TOOLS LASSEN DIR DIE WAHL</span><h2>Für deinen Alltag.<br><em>Nicht für deine Daten.</em></h2><div class="grid"><article><span class="number">01</span><h3>Alles an seinem Platz</h3><p>Lesezeichen direkt bearbeiten und per Drag-and-drop sortieren. Eine Uhr und Begrüßung, die du gestalten oder ausblenden kannst.</p></article><article><span class="number">02</span><h3>26 Suchmaschinen</h3><p>DuckDuckGo und Brave zuerst. Mit klaren Hinweisen zum Anbieter. Mit ct auch direkt aus der Adressleiste suchen.</p></article><article><span class="number">03</span><h3>Dein Blick nach draußen</h3><p>Farbflächen, sechs Verläufe, eigenes Bild oder optional Pexels-Fotos mit deinem API-Key und Fotografen-Credit.</p></article><article><span class="number">04</span><h3>So wenig UI, wie du willst</h3><p>Glass, frosted oder solid. Nur eine Suchleiste? Geht. Eigene URL statt Dashboard? Auch das geht.</p></article></div></section><section class="section install"><div><span class="eyebrow">LOSLEGEN</span><h2>Offen gebaut.<br><em>Offen erklärt.</em></h2><p>Installation, Voraussetzungen und Grenzen findest du im Repository. Kein Marketing-Versprechen ersetzt die Dokumentation.</p><a class="button" href="https://github.com/philppplik/custm-tab/blob/main/extension/TECHNICAL.md">Dokumentation lesen ↗</a></div><div><pre>Chrome / Edge / Brave:
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>cust*m Tab - Ein neuer Tab. Ganz deiner.</title>
+    <meta
+      name="description"
+      content="Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne Telemetrie."
+    />
+    <link rel="canonical" href="https://custmtab.philipp-paulik.de/" />
+    <meta name="theme-color" content="#111313" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:site_name" content="cust*m Tab" />
+    <meta property="og:title" content="cust*m Tab - Ein neuer Tab. Ganz deiner." />
+    <meta
+      property="og:description"
+      content="Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne Telemetrie."
+    />
+    <meta property="og:url" content="https://custmtab.philipp-paulik.de/" />
+    <meta
+      property="og:image"
+      content="https://custmtab.philipp-paulik.de/assets/01-dashboard-aurora.jpg"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="cust*m Tab - Ein neuer Tab. Ganz deiner." />
+    <meta
+      name="twitter:description"
+      content="Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne Telemetrie."
+    />
+    <meta
+      name="twitter:image"
+      content="https://custmtab.philipp-paulik.de/assets/01-dashboard-aurora.jpg"
+    />
+    <style>
+      :root {
+        --accent: #c8a8ff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: #111313;
+        color: #eeeae3;
+        font:
+          16px/1.65 Arial,
+          sans-serif;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a:hover {
+        color: var(--accent);
+      }
+      .wrap {
+        max-width: 1200px;
+        margin: auto;
+        padding: 0 6%;
+      }
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 28px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid #ffffff20;
+      }
+      .brand {
+        font-weight: 700;
+        font-size: 25px;
+        letter-spacing: -1px;
+      }
+      .nav nav {
+        display: flex;
+        gap: 25px;
+        font-size: 13px;
+      }
+      .tag,
+      .eyebrow {
+        font: 11px/1.5 monospace;
+        letter-spacing: 2px;
+        color: var(--accent);
+      }
+      .hero {
+        padding-top: 95px;
+        padding-bottom: 85px;
+        position: relative;
+      }
+      .hero:after {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at 90% 10%,
+          color-mix(in srgb, var(--accent) 10%, transparent),
+          transparent 60%
+        );
+      }
+      h1,
+      h2 {
+        font-family: Georgia, serif;
+        font-weight: 400;
+        line-height: 1.04;
+        letter-spacing: -3px;
+      }
+      h1 {
+        font-size: clamp(52px, 7.3vw, 100px);
+        margin: 25px 0 30px;
+      }
+      em {
+        font-weight: 400;
+        color: var(--accent);
+      }
+      .lead {
+        max-width: 670px;
+        color: #bdbeb8;
+        font-size: 19px;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin: 32px 0;
+      }
+      .button {
+        border: 1px solid #ffffff30;
+        padding: 12px 23px;
+        border-radius: 100px;
+        font-size: 14px;
+        display: inline-block;
+      }
+      .primary {
+        background: var(--accent);
+        color: #101313;
+        border-color: var(--accent);
+      }
+      .primary:hover {
+        color: #101313;
+        filter: brightness(1.1);
+      }
+      .meta {
+        color: #919790;
+        font: 12px/1.8 monospace;
+      }
+      .visual {
+        border: 1px solid #ffffff24;
+        border-radius: 14px;
+        background: #191c1c;
+        overflow: hidden;
+        margin: 0 0 70px;
+      }
+      .visual img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .visual .bar {
+        padding: 12px 20px;
+        border-bottom: 1px solid #ffffff18;
+        font: 11px monospace;
+        color: #999;
+      }
+      .terminal {
+        padding: 40px;
+        font: clamp(13px, 2vw, 19px)/2 monospace;
+      }
+      .terminal span {
+        color: var(--accent);
+      }
+      .section {
+        padding: 65px 0;
+        border-top: 1px solid #ffffff20;
+      }
+      h2 {
+        font-size: clamp(38px, 5vw, 62px);
+        margin: 15px 0 35px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 45px;
+      }
+      .grid article {
+        border-top: 1px solid #ffffff20;
+        padding-top: 20px;
+      }
+      .number {
+        color: var(--accent);
+        font: 12px monospace;
+      }
+      h3 {
+        font-size: 21px;
+        font-weight: 400;
+        margin: 15px 0 8px;
+      }
+      p {
+        color: #bdbeb8;
+      }
+      .install {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+      }
+      .install pre {
+        padding: 22px;
+        background: #1b1e1e;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        border: 1px solid #ffffff24;
+        color: var(--accent);
+        font-size: 13px;
+      }
+      .faq {
+        max-width: 820px;
+      }
+      details {
+        border-top: 1px solid #ffffff25;
+        padding: 20px 0;
+      }
+      summary {
+        cursor: pointer;
+        font-size: 19px;
+      }
+      footer {
+        padding: 45px 0;
+        color: #9ca19a;
+        font-size: 13px;
+      }
+      footer .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 22px;
+        margin-top: 20px;
+      }
+      .legal {
+        max-width: 850px;
+        padding-top: 60px;
+        padding-bottom: 60px;
+      }
+      .legal h1 {
+        font-size: 60px;
+      }
+      .legal h2 {
+        font: 26px Georgia;
+        letter-spacing: 0;
+        line-height: 1.2;
+        margin-top: 35px;
+      }
+      .legal a {
+        text-decoration: underline;
+      }
+      .skip {
+        position: absolute;
+        top: -100px;
+      }
+      .skip:focus {
+        top: 0;
+        background: #fff;
+        color: #000;
+        padding: 10px;
+      }
+      @media (max-width: 650px) {
+        .nav nav {
+          gap: 12px;
+          font-size: 11px;
+        }
+        .brand {
+          font-size: 21px;
+        }
+        .hero {
+          padding-top: 65px;
+          padding-bottom: 45px;
+        }
+        h1 {
+          letter-spacing: -2px;
+        }
+        .lead {
+          font-size: 17px;
+        }
+        .grid,
+        .install {
+          grid-template-columns: 1fr;
+          gap: 25px;
+        }
+        .terminal {
+          padding: 20px;
+          font-size: 12px;
+        }
+        .section {
+          padding: 45px 0;
+        }
+        .visual {
+          margin-bottom: 40px;
+        }
+        .legal h1 {
+          font-size: 44px;
+        }
+        .nav nav a:first-child {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Zum Inhalt</a>
+    <header class="wrap nav">
+      <a class="brand" href="./">cust*m Tab</a>
+      <nav>
+        <a href="./#features">Features</a
+        ><a
+          href="https://github.com/philppplik/custm-tab/blob/main/extension/TECHNICAL.md"
+          >Dokumentation ↗</a
+        ><a href="https://github.com/philppplik/custm-tab">GitHub ↗</a>
+      </nav>
+    </header>
+    <main id="main" class="wrap">
+      <section class="hero">
+        <span class="eyebrow">YOUR TAB. YOUR RULES.</span>
+        <h1>Ein neuer Tab.<br /><em>Ganz deiner.</em></h1>
+        <p class="lead">
+          Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene
+          URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne
+          Telemetrie.
+        </p>
+        <div class="actions">
+          <a
+            class="button primary"
+            href="https://github.com/philppplik/custm-tab/releases/latest"
+            >Release herunterladen ↗</a
+          ><a class="button" href="https://github.com/philppplik/custm-tab"
+            >Quellcode ansehen ↗</a
+          >
+        </div>
+        <div class="meta">
+          OPEN SOURCE / MIT · Chrome 121+ / Firefox 142+<br />Repository-Stand: Version
+          1.3.0 · 1. Oktober 2026
+        </div>
+      </section>
+      <figure class="visual" style="margin-left: 0; margin-right: 0">
+        <div class="bar">CUST*M TAB / ECHTE DASHBOARD-ANSICHT AUS DEM REPOSITORY</div>
+        <img
+          src="assets/01-dashboard-aurora.jpg"
+          alt="cust*m Tab Dashboard mit Uhr, Suchleiste und Lesezeichen auf violettem Verlauf"
+          width="1280"
+          height="800"
+        />
+      </figure>
+      <section class="section" id="features">
+        <span class="eyebrow">GUTE TOOLS LASSEN DIR DIE WAHL</span>
+        <h2>Für deinen Alltag.<br /><em>Nicht für deine Daten.</em></h2>
+        <div class="grid">
+          <article>
+            <span class="number">01</span>
+            <h3>Alles an seinem Platz</h3>
+            <p>
+              Lesezeichen direkt bearbeiten und per Drag-and-drop sortieren. Eine Uhr und
+              Begrüßung, die du gestalten oder ausblenden kannst.
+            </p>
+          </article>
+          <article>
+            <span class="number">02</span>
+            <h3>26 Suchmaschinen</h3>
+            <p>
+              DuckDuckGo und Brave zuerst. Mit klaren Hinweisen zum Anbieter. Mit ct auch
+              direkt aus der Adressleiste suchen.
+            </p>
+          </article>
+          <article>
+            <span class="number">03</span>
+            <h3>Dein Blick nach draußen</h3>
+            <p>
+              Farbflächen, sechs Verläufe, eigenes Bild oder optional Pexels-Fotos mit
+              deinem API-Key und Fotografen-Credit.
+            </p>
+          </article>
+          <article>
+            <span class="number">04</span>
+            <h3>So wenig UI, wie du willst</h3>
+            <p>
+              Glass, frosted oder solid. Nur eine Suchleiste? Geht. Eigene URL statt
+              Dashboard? Auch das geht.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section class="section install">
+        <div>
+          <span class="eyebrow">LOSLEGEN</span>
+          <h2>Offen gebaut.<br /><em>Offen erklärt.</em></h2>
+          <p>
+            Installation, Voraussetzungen und Grenzen findest du im Repository. Kein
+            Marketing-Versprechen ersetzt die Dokumentation.
+          </p>
+          <a
+            class="button"
+            href="https://github.com/philppplik/custm-tab/blob/main/extension/TECHNICAL.md"
+            >Dokumentation lesen ↗</a
+          >
+        </div>
+        <div>
+          <pre>
+Chrome / Edge / Brave:
 Release-ZIP entpacken
 chrome://extensions → Entwicklermodus
-„Entpackte Erweiterung laden“</pre><p class="meta">Kein Store-Download wird hier behauptet. Releases und README zeigen den aktuellen Installationsweg.</p></div></section><section class="section faq"><span class="eyebrow">DIREKTE ANTWORTEN</span><h2>Gut zu wissen.</h2><details><summary>Was ist cust*m Tab?</summary><p>Eine quelloffene New-Tab-Erweiterung mit konfigurierbarem Dashboard oder eigener URL. Kein Account, keine Telemetrie, kein Projekt-Server.</p></details><details><summary>Wie installiere ich die Erweiterung?</summary><p>Store-Listings sind laut Projekt-README noch ausstehend. Chrome, Edge und Brave: Release-ZIP entpacken und als entpackte Erweiterung laden. Firefox: Firefox-Paket temporär über about:debugging laden.</p></details><details><summary>Verlassen Daten meinen Browser?</summary><p>Suchanfragen gehen an deine gewählte Suchmaschine. Optional senden Pexels-Fotos und entfernte Icons Anfragen an ihre Anbieter. Standard-Icons werden lokal geladen. Bookmarks und API-Key werden nicht synchronisiert.</p></details><details><summary>Kann ich Einstellungen synchronisieren?</summary><p>Ja, optional über den Browser. Lesezeichen und dein Pexels-API-Key bleiben auf dem Gerät.</p></details></section></main><script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "@id": "https://custmtab.philipp-paulik.de/#software", "name": "cust*m Tab", "description": "Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne Telemetrie.", "url": "https://custmtab.philipp-paulik.de/", "softwareVersion": "1.3.0", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Chrome 121+ / Firefox 142+", "isAccessibleForFree": true, "license": "https://github.com/philppplik/custm-tab/blob/main/LICENSE", "author": {"@type": "Person", "name": "Philipp Paulik", "url": "https://philipp-paulik.de/"}, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "cust*m Tab", "codeRepository": "https://github.com/philppplik/custm-tab", "url": "https://custmtab.philipp-paulik.de/", "license": "https://github.com/philppplik/custm-tab/blob/main/LICENSE"}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Was ist cust*m Tab?", "acceptedAnswer": {"@type": "Answer", "text": "Eine quelloffene New-Tab-Erweiterung mit konfigurierbarem Dashboard oder eigener URL. Kein Account, keine Telemetrie, kein Projekt-Server."}}, {"@type": "Question", "name": "Wie installiere ich die Erweiterung?", "acceptedAnswer": {"@type": "Answer", "text": "Store-Listings sind laut Projekt-README noch ausstehend. Chrome, Edge und Brave: Release-ZIP entpacken und als entpackte Erweiterung laden. Firefox: Firefox-Paket temporär über about:debugging laden."}}, {"@type": "Question", "name": "Verlassen Daten meinen Browser?", "acceptedAnswer": {"@type": "Answer", "text": "Suchanfragen gehen an deine gewählte Suchmaschine. Optional senden Pexels-Fotos und entfernte Icons Anfragen an ihre Anbieter. Standard-Icons werden lokal geladen. Bookmarks und API-Key werden nicht synchronisiert."}}, {"@type": "Question", "name": "Kann ich Einstellungen synchronisieren?", "acceptedAnswer": {"@type": "Answer", "text": "Ja, optional über den Browser. Lesezeichen und dein Pexels-API-Key bleiben auf dem Gerät."}}]}</script><footer class="wrap"><span>Ein Projekt von <a href="https://philipp-paulik.de/">Philipp Paulik ↗</a> · Open Source · MIT</span><div class="links"><a href="impressum">Impressum</a><a href="datenschutz">Datenschutz</a><a href="https://hob.philipp-paulik.de/">Daily Hob</a><a href="https://kifachblatt.de/">KI Fachblatt</a></div></footer></body></html>
+„Entpackte Erweiterung laden“</pre>
+          <p class="meta">
+            Kein Store-Download wird hier behauptet. Releases und README zeigen den
+            aktuellen Installationsweg.
+          </p>
+        </div>
+      </section>
+      <section class="section faq">
+        <span class="eyebrow">DIREKTE ANTWORTEN</span>
+        <h2>Gut zu wissen.</h2>
+        <details>
+          <summary>Was ist cust*m Tab?</summary>
+          <p>
+            Eine quelloffene New-Tab-Erweiterung mit konfigurierbarem Dashboard oder
+            eigener URL. Kein Account, keine Telemetrie, kein Projekt-Server.
+          </p>
+        </details>
+        <details>
+          <summary>Wie installiere ich die Erweiterung?</summary>
+          <p>
+            Store-Listings sind laut Projekt-README noch ausstehend. Chrome, Edge und
+            Brave: Release-ZIP entpacken und als entpackte Erweiterung laden. Firefox:
+            Firefox-Paket temporär über about:debugging laden.
+          </p>
+        </details>
+        <details>
+          <summary>Verlassen Daten meinen Browser?</summary>
+          <p>
+            Suchanfragen gehen an deine gewählte Suchmaschine. Optional senden
+            Pexels-Fotos und entfernte Icons Anfragen an ihre Anbieter. Standard-Icons
+            werden lokal geladen. Bookmarks und API-Key werden nicht synchronisiert.
+          </p>
+        </details>
+        <details>
+          <summary>Kann ich Einstellungen synchronisieren?</summary>
+          <p>
+            Ja, optional über den Browser. Lesezeichen und dein Pexels-API-Key bleiben auf
+            dem Gerät.
+          </p>
+        </details>
+      </section>
+    </main>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "@id": "https://custmtab.philipp-paulik.de/#software",
+        "name": "cust*m Tab",
+        "description": "Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne Telemetrie.",
+        "url": "https://custmtab.philipp-paulik.de/",
+        "softwareVersion": "1.3.0",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Chrome 121+ / Firefox 142+",
+        "isAccessibleForFree": true,
+        "license": "https://github.com/philppplik/custm-tab/blob/main/LICENSE",
+        "author": {
+          "@type": "Person",
+          "name": "Philipp Paulik",
+          "url": "https://philipp-paulik.de/"
+        },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        "name": "cust*m Tab",
+        "codeRepository": "https://github.com/philppplik/custm-tab",
+        "url": "https://custmtab.philipp-paulik.de/",
+        "license": "https://github.com/philppplik/custm-tab/blob/main/LICENSE"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Was ist cust*m Tab?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Eine quelloffene New-Tab-Erweiterung mit konfigurierbarem Dashboard oder eigener URL. Kein Account, keine Telemetrie, kein Projekt-Server."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Wie installiere ich die Erweiterung?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Store-Listings sind laut Projekt-README noch ausstehend. Chrome, Edge und Brave: Release-ZIP entpacken und als entpackte Erweiterung laden. Firefox: Firefox-Paket temporär über about:debugging laden."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Verlassen Daten meinen Browser?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Suchanfragen gehen an deine gewählte Suchmaschine. Optional senden Pexels-Fotos und entfernte Icons Anfragen an ihre Anbieter. Standard-Icons werden lokal geladen. Bookmarks und API-Key werden nicht synchronisiert."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Kann ich Einstellungen synchronisieren?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ja, optional über den Browser. Lesezeichen und dein Pexels-API-Key bleiben auf dem Gerät."
+            }
+          }
+        ]
+      }
+    </script>
+    <footer class="wrap">
+      <span
+        >Ein Projekt von <a href="https://philipp-paulik.de/">Philipp Paulik ↗</a> · Open
+        Source · MIT</span
+      >
+      <div class="links">
+        <a href="impressum">Impressum</a><a href="datenschutz">Datenschutz</a
+        ><a href="https://hob.philipp-paulik.de/">Daily Hob</a
+        ><a href="https://kifachblatt.de/">KI Fachblatt</a>
+      </div>
+    </footer>
+  </body>
+</html>
