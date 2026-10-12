@@ -1,0 +1,20 @@
+# cust*m Tab
+
+> Dein Dashboard, deine Suchmaschine, dein Hintergrund. Oder einfach deine eigene URL. Eine neue Tab-Seite für Chrome und Firefox, ohne Account und ohne Telemetrie.
+
+- [Project](https://custmtab.philipp-paulik.de/)
+- [Source](https://github.com/philppplik/custm-tab)
+- [Documentation](https://github.com/philppplik/custm-tab/blob/main/extension/TECHNICAL.md)
+- [Privacy](https://custmtab.philipp-paulik.de/datenschutz)
+
+Was ist cust*m Tab?
+Eine quelloffene New-Tab-Erweiterung mit konfigurierbarem Dashboard oder eigener URL. Kein Account, keine Telemetrie, kein Projekt-Server.
+
+Wie installiere ich die Erweiterung?
+Store-Listings sind laut Projekt-README noch ausstehend. Chrome, Edge und Brave: Release-ZIP entpacken und als entpackte Erweiterung laden. Firefox: Firefox-Paket temporär über about:debugging laden.
+
+Verlassen Daten meinen Browser?
+Suchanfragen gehen an deine gewählte Suchmaschine. Optional senden Pexels-Fotos und entfernte Icons Anfragen an ihre Anbieter. Standard-Icons werden lokal geladen. Bookmarks und API-Key werden nicht synchronisiert.
+
+Kann ich Einstellungen synchronisieren?
+Ja, optional über den Browser. Lesezeichen und dein Pexels-API-Key bleiben auf dem Gerät.
