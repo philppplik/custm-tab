@@ -22,7 +22,11 @@ That serves the repository at <http://localhost:8765>. Open:
 
 `preview.html` fetches the requested page from `extension/`, strips its
 `<script>` tags, injects the body into itself, and then loads the same scripts
-in the order the page declares. Before any of that it installs a small stub of
+in the order the page declares. Only `newtab`, `options`, and `wizard` are
+accepted: each selects a literal local URL. A missing `page` defaults to
+`newtab`; an empty or unknown value is rejected before fetching or inserting
+HTML. Paths, URLs, and prototype property names are not preview pages.
+Before any of that it installs a small stub of
 the browser APIs the pages touch, backed by an in-memory store.
 
 Because the page's own HTML, CSS and JavaScript are loaded unmodified, a
