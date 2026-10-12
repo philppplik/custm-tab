@@ -3,10 +3,16 @@ import { runInNewContext } from 'node:vm';
 import { join } from 'node:path';
 import { REPO_ROOT } from './helpers/load-script.js';
 import { describe, expect, it, vi } from 'vitest';
+import { Window } from 'happy-dom';
 
-const harness = readFileSync(join(REPO_ROOT, 'tools/preview/preview.html'), 'utf8').match(
-  /<script>([\s\S]*?)<\/script>/
-)[1];
+const parserWindow = new Window({
+  settings: { disableCSSFileLoading: true, disableJavaScriptEvaluation: true },
+});
+const harnessDocument = new parserWindow.DOMParser().parseFromString(
+  readFileSync(join(REPO_ROOT, 'tools/preview/preview.html'), 'utf8'),
+  'text/html'
+);
+const harness = harnessDocument.querySelector('script').textContent;
 
 async function preview(query) {
   const fetch = vi.fn(async () => ({ text: async () => '<body></body>' }));
