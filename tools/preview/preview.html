@@ -94,10 +94,23 @@
 
         /** Load the requested page's body and scripts. */
         async function mount() {
-          const page = params.get('page') || 'newtab';
-          const html = await fetch('../../extension/' + page + '.html').then((r) =>
-            r.text()
-          );
+          const page = params.get('page') ?? 'newtab';
+          // Select literal local URLs, never construct a path from query input.
+          let pageUrl;
+          switch (page) {
+            case 'newtab':
+              pageUrl = '../../extension/newtab.html';
+              break;
+            case 'options':
+              pageUrl = '../../extension/options.html';
+              break;
+            case 'wizard':
+              pageUrl = '../../extension/wizard.html';
+              break;
+            default:
+              throw new Error('unsupported preview page');
+          }
+          const html = await fetch(pageUrl).then((r) => r.text());
           const doc = new DOMParser().parseFromString(html, 'text/html');
 
           const sources = [...doc.querySelectorAll('script[src]')].map((s) =>
